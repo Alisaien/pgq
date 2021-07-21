@@ -1,6 +1,7 @@
 package pqtype
 
 import (
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	jsoniter "github.com/json-iterator/go"
@@ -9,17 +10,29 @@ import (
 
 type UUID []byte
 
+const (
+	uuidSize = 16
+	UUIDOID = 2950
+)
+
 func (u *UUID) DecodeBinary(src []byte) ([]byte, error) {
-	if len(src) < 16 {
+	const size = valueHeaderSize + uuidSize
+
+	if len(src) < size {
 		return nil, ErrInsufficientBytes
+	}
+
+	typ := int32(binary.BigEndian.Uint32(src))
+	if typ != UUIDOID {
+		return nil, &DecodeTypeErr{expected: UUIDOID, got: typ}
 	}
 
 	if *u == nil {
 		*u = make([]byte, 16)
 	}
 
-	copy(*u, src)
-	return src[16:], nil
+	copy(*u, src[valueHeaderSize:])
+	return src[size:], nil
 }
 
 func (u UUID) MarshalJSON() ([]byte, error) {
@@ -49,7 +62,7 @@ func (u UUID) Encode(_ unsafe.Pointer, stream *jsoniter.Stream) {
 	_, _ = stream.Write(u)
 }
 
-func (u UUID) IsEmpty(ptr unsafe.Pointer) bool {
+func (u UUID) IsEmpty(_ unsafe.Pointer) bool {
 	return u == nil
 }
 

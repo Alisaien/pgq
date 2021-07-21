@@ -56,7 +56,6 @@ const (
 	VarbitOID           = 1562
 	NumericOID          = 1700
 	RecordOID           = 2249
-	UUIDOID             = 2950
 	UUIDArrayOID        = 2951
 	JSONBOID            = 3802
 	JSONBArrayOID       = 3807
@@ -68,4 +67,8 @@ const (
 	TstzrangeOID        = 3910
 	TstzrangeArrayOID   = 3911
 	Int8rangeOID        = 3926
+)
+
+const (
+	valueHeaderSize = 8
 )
