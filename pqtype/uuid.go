@@ -32,7 +32,7 @@ func (u *UUID) DecodeBinary(src []byte) ([]byte, error) {
 }
 
 func (u UUID) MarshalJSON() ([]byte, error) {
-	return []byte(u.String()), nil
+	return []byte(`"` + u.String() + `"`), nil
 }
 
 func (u *UUID) UnmarshalJSON(src []byte) error {
@@ -52,7 +52,7 @@ func (u UUID) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 }
 
 func (u UUID) Encode(_ unsafe.Pointer, stream *jsoniter.Stream) {
-	_, _ = stream.Write(u[:])
+	stream.WriteString(u.String())
 }
 
 func (u UUID) IsEmpty(_ unsafe.Pointer) bool {
