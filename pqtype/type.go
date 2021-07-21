@@ -8,7 +8,6 @@ const (
 	Int8OID             = 20
 	Int2OID             = 21
 	Int4OID             = 23
-	TextOID             = 25
 	OIDOID              = 26
 	TIDOID              = 27
 	XIDOID              = 28
@@ -70,5 +69,7 @@ const (
 )
 
 const (
-	valueHeaderSize = 8
+	typeOffset  = 0
+	sizeOffset  = 4
+	valueOffset = 8
 )

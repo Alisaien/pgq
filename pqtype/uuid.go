@@ -16,7 +16,7 @@ const (
 )
 
 func (u *UUID) DecodeBinary(src []byte) ([]byte, error) {
-	const size = valueHeaderSize + uuidSize
+	const size = valueOffset + uuidSize
 
 	if len(src) < size {
 		return nil, ErrInsufficientBytes
@@ -31,7 +31,7 @@ func (u *UUID) DecodeBinary(src []byte) ([]byte, error) {
 		*u = make([]byte, 16)
 	}
 
-	copy(*u, src[valueHeaderSize:])
+	copy(*u, src[valueOffset:])
 	return src[size:], nil
 }
 
@@ -51,7 +51,7 @@ func (u *UUID) UnmarshalJSON(src []byte) error {
 
 func (u UUID) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 	var err error
-	*ptr, err = parseUUID(iter.ReadString())
+	*(*UUID)(ptr), err = parseUUID(iter.ReadString())
 
 	if err != nil {
 		iter.ReportError("DecodeUUID", err.Error())
