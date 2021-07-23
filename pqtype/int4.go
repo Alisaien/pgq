@@ -6,8 +6,14 @@ import (
 
 type Int4 int32
 
+const (
+	Int4OID  = 23
+	int4Size = 4
+)
+
 func (v *Int4) DecodeBinary(src []byte) ([]byte, error) {
-	if len(src) < 12 {
+	const size = valueOffset + int4Size
+	if len(src) < size {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -16,24 +22,22 @@ func (v *Int4) DecodeBinary(src []byte) ([]byte, error) {
 		return nil, &DecodeTypeErr{expected: Int4OID, got: typ}
 	}
 
-	if int32(binary.BigEndian.Uint32(src[4:])) == -1 {
+	if int32(binary.BigEndian.Uint32(src[sizeOffset:])) == -1 {
 		return nil, ErrNullValue
 	}
 
-	*v = Int4(binary.BigEndian.Uint32(src[8:]))
+	*v = Int4(binary.BigEndian.Uint32(src[valueOffset:]))
 
-	return src[12:], nil
+	return src[size:], nil
 }
-
-
 
 func Int4Null(src []byte) (*Int4, []byte, error) {
 	if len(src) < 8 {
 		return nil, nil, ErrInsufficientBytes
 	}
 
-	if int32(binary.BigEndian.Uint32(src[4:])) == -1 {
-		return nil, src[8:], nil
+	if int32(binary.BigEndian.Uint32(src[sizeOffset:])) == -1 {
+		return nil, src[valueOffset:], nil
 	}
 
 	i := new(Int4)

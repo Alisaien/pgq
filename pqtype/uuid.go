@@ -12,7 +12,7 @@ type UUID [16]byte
 
 const (
 	uuidSize = 16
-	UUIDOID = 2950
+	UUIDOID  = 2950
 )
 
 func (u *UUID) DecodeBinary(src []byte) ([]byte, error) {

@@ -7,7 +7,7 @@ import (
 
 type DecodeTypeErr struct {
 	expected int32
-	got int32
+	got      int32
 }
 
 func (e *DecodeTypeErr) Error() string {
