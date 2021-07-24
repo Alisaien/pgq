@@ -37,8 +37,8 @@ func (v *Timestamptz) DecodeBinary(src []byte) ([]byte, error) {
 	case negInftyMicroSecOffset:
 		v.infty = -1
 	default:
-		microsecSinceUnixEpoch := microSecFromUnixEpochToY2K + microsecSinceY2K
-		v.Time = time.Unix(microsecSinceUnixEpoch/1000000, (microsecSinceUnixEpoch%1000000)*1000)
+		microSecSinceUnixEpoch := microSecFromUnixEpochToY2K + microsecSinceY2K
+		v.Time = time.Unix(microSecSinceUnixEpoch/1000000, (microSecSinceUnixEpoch%1000000)*1000)
 		v.infty = 0
 	}
 
