@@ -5,10 +5,7 @@ import (
 	"time"
 )
 
-type Date struct {
-	time.Time
-	infty int8
-}
+type Date time.Time
 
 const (
 	DateOID  = 1082
@@ -29,16 +26,15 @@ func (v *Date) FromBinary(src []byte) ([]byte, error) {
 		return nil, &DecodeTypeErr{expected: DateOID, got: typ}
 	}
 
-	dayOffset := int32(binary.BigEndian.Uint32(src))
+	dayOffset := int32(binary.BigEndian.Uint32(src[valueOffset:]))
 
 	switch dayOffset {
 	case inftyDayOffset:
-		v.infty = 1
+		return nil, ErrInfinity
 	case negInftyDayOffset:
-		v.infty = -1
+		return nil, ErrInfinity
 	default:
-		v.Time = time.Date(2000, 1, int(1+dayOffset), 0, 0, 0, 0, time.UTC)
-		v.infty = 0
+		*v = Date(time.Date(2000, 1, int(1+dayOffset), 0, 0, 0, 0, time.UTC))
 	}
 
 	return src[size:], nil
