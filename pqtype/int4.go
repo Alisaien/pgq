@@ -42,6 +42,6 @@ func Int4Null(src []byte) (*Int4, []byte, error) {
 
 	i := new(Int4)
 	var err error
-	src, err = i.DecodeBinary(src)
+	src, err = i.FromBinary(src)
 	return i, src, err
 }
