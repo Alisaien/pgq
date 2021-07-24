@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type Date time.Time
+type Date struct{ time.Time }
 
 const (
 	DateOID  = 1082
@@ -17,7 +17,7 @@ const (
 )
 
 func (v *Date) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < valueOffset + dateSize {
+	if len(src) < valueOffset+dateSize {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -38,13 +38,13 @@ func (v *Date) fromBinary(src []byte) ([]byte, error) {
 	case negInftyDayOffset:
 		return nil, ErrInfinity
 	default:
-		*v = Date(time.Date(2000, 1, int(1+dayOffset), 0, 0, 0, 0, time.UTC))
+		v.Time = time.Date(2000, 1, int(1+dayOffset), 0, 0, 0, 0, time.UTC)
 	}
 
 	return src[dateSize:], nil
 }
 
-func (v *Date) DecodeBinary(_ *pgtype.ConnInfo, src[]byte) error {
+func (v *Date) DecodeBinary(_ *pgtype.ConnInfo, src []byte) error {
 	if len(src) != dateSize {
 		return ErrInvalidSrcLength
 	}

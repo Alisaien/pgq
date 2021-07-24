@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type Timestamptz struct{time.Time}
+type Timestamptz struct{ time.Time }
 
 const (
 	TimestamptzOID  = 1184
@@ -18,7 +18,7 @@ const (
 )
 
 func (v *Timestamptz) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < valueOffset + timestamptzSize {
+	if len(src) < valueOffset+timestamptzSize {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -45,7 +45,7 @@ func (v *Timestamptz) fromBinary(src []byte) ([]byte, error) {
 	return src[timestamptzSize:], nil
 }
 
-func (v *Timestamptz) DecodeBinary(_ *pgtype.ConnInfo, src[]byte) error {
+func (v *Timestamptz) DecodeBinary(_ *pgtype.ConnInfo, src []byte) error {
 	if len(src) != timestamptzSize {
 		return ErrInvalidSrcLength
 	}
