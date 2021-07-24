@@ -6,7 +6,7 @@ type Text string
 
 const TextOID = 25
 
-func (t *Text) DecodeBinary(src []byte) ([]byte, error) {
+func (t *Text) FromBinary(src []byte) ([]byte, error) {
 	if len(src) < valueOffset {
 		return nil, ErrInsufficientBytes
 	}

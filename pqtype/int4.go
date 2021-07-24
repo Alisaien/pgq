@@ -11,7 +11,7 @@ const (
 	int4Size = 4
 )
 
-func (v *Int4) DecodeBinary(src []byte) ([]byte, error) {
+func (v *Int4) FromBinary(src []byte) ([]byte, error) {
 	const size = valueOffset + int4Size
 	if len(src) < size {
 		return nil, ErrInsufficientBytes

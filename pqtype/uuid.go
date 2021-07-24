@@ -15,7 +15,7 @@ const (
 	UUIDOID  = 2950
 )
 
-func (u *UUID) DecodeBinary(src []byte) ([]byte, error) {
+func (u *UUID) FromBinary(src []byte) ([]byte, error) {
 	const size = valueOffset + uuidSize
 
 	if len(src) < size {

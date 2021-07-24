@@ -9,7 +9,7 @@ const (
 	int2Size = 2
 )
 
-func (v *Int2) DecodeBinary(src []byte) ([]byte, error) {
+func (v *Int2) FromBinary(src []byte) ([]byte, error) {
 	const size = valueOffset + int2Size
 
 	if len(src) < size {
@@ -41,6 +41,6 @@ func Int2Null(src []byte) (*Int2, []byte, error) {
 
 	i := new(Int2)
 	var err error
-	src, err = i.DecodeBinary(src)
+	src, err = i.FromBinary(src)
 	return i, src, err
 }

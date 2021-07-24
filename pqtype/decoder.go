@@ -1,5 +1,5 @@
 package pqtype
 
-type BinaryDecoder interface {
-	DecodeBinary(src []byte) ([]byte, error)
+type Decoder interface {
+	FromBinary(src []byte) ([]byte, error)
 }

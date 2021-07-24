@@ -18,7 +18,7 @@ const (
 	negInftyDayOffset = -2147483648
 )
 
-func (v *Date) DecodeBinary(src []byte) ([]byte, error) {
+func (v *Date) FromBinary(src []byte) ([]byte, error) {
 	const size = valueOffset + dateSize
 	if len(src) < size {
 		return nil, ErrInsufficientBytes

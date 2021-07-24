@@ -2,6 +2,7 @@ package pqtype
 
 import (
 	"encoding/binary"
+	"github.com/jackc/pgtype"
 	"time"
 )
 
@@ -19,7 +20,7 @@ const (
 	negInftyMicroSecOffset     = -9223372036854775808
 )
 
-func (v *Timestamptz) DecodeBinary(src []byte) ([]byte, error) {
+func (v *Timestamptz) FromBinary(src []byte) ([]byte, error) {
 	const size = valueOffset + timestamptzSize
 	if len(src) < size {
 		return nil, ErrInsufficientBytes
@@ -30,7 +31,7 @@ func (v *Timestamptz) DecodeBinary(src []byte) ([]byte, error) {
 		return nil, &DecodeTypeErr{expected: TimestamptzOID, got: typ}
 	}
 
-	microsecSinceY2K := int64(binary.BigEndian.Uint64(src))
+	microsecSinceY2K := int64(binary.BigEndian.Uint64(src[valueOffset:]))
 	switch microsecSinceY2K {
 	case inftyMicroSecOffset:
 		v.infty = 1
@@ -43,4 +44,11 @@ func (v *Timestamptz) DecodeBinary(src []byte) ([]byte, error) {
 	}
 
 	return src[size:], nil
+}
+
+func (v *Timestamptz) DecodeBinary(_ *pgtype.ConnInfo, src[]byte) error {
+	var err error
+	_, err = v.FromBinary(src)
+
+	return err
 }

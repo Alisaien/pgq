@@ -9,7 +9,7 @@ const (
 	boolSize = 1
 )
 
-func (v *Bool) DecodeBinary(src []byte) ([]byte, error) {
+func (v *Bool) FromBinary(src []byte) ([]byte, error) {
 	const size = valueOffset + boolSize
 
 	if len(src) < size {
