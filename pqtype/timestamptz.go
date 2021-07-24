@@ -50,8 +50,8 @@ func (v *Timestamptz) fromBinary(src []byte) ([]byte, error) {
 }
 
 func (v *Timestamptz) DecodeBinary(_ *pgtype.ConnInfo, src[]byte) error {
-	if len(src) < valueOffset + timestamptzSize {
-		return ErrInsufficientBytes
+	if len(src) != timestamptzSize {
+		return ErrInvalidLength
 	}
 
 	var err error

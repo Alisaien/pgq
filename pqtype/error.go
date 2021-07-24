@@ -16,4 +16,6 @@ func (e *DecodeTypeErr) Error() string {
 
 var ErrInsufficientBytes = errors.New("insufficient bytes left in src")
 
+var ErrInvalidLength = errors.New("invalid valid length for type")
+
 var ErrNullValue = errors.New("expected not null value")
