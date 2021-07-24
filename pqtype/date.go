@@ -2,6 +2,7 @@ package pqtype
 
 import (
 	"encoding/binary"
+	"github.com/jackc/pgtype"
 	"time"
 )
 
@@ -16,8 +17,7 @@ const (
 )
 
 func (v *Date) FromBinary(src []byte) ([]byte, error) {
-	const size = valueOffset + dateSize
-	if len(src) < size {
+	if len(src) < valueOffset + dateSize {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -26,7 +26,11 @@ func (v *Date) FromBinary(src []byte) ([]byte, error) {
 		return nil, &DecodeTypeErr{expected: DateOID, got: typ}
 	}
 
-	dayOffset := int32(binary.BigEndian.Uint32(src[valueOffset:]))
+	return v.fromBinary(src[valueOffset:])
+}
+
+func (v *Date) fromBinary(src []byte) ([]byte, error) {
+	dayOffset := int32(binary.BigEndian.Uint32(src))
 
 	switch dayOffset {
 	case inftyDayOffset:
@@ -37,5 +41,15 @@ func (v *Date) FromBinary(src []byte) ([]byte, error) {
 		*v = Date(time.Date(2000, 1, int(1+dayOffset), 0, 0, 0, 0, time.UTC))
 	}
 
-	return src[size:], nil
+	return src[dateSize:], nil
+}
+
+func (v *Date) DecodeBinary(_ *pgtype.ConnInfo, src[]byte) error {
+	if len(src) != dateSize {
+		return ErrInvalidSrcLength
+	}
+
+	var err error
+	_, err = v.fromBinary(src)
+	return err
 }

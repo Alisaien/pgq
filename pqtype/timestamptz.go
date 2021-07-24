@@ -2,10 +2,11 @@ package pqtype
 
 import (
 	"encoding/binary"
+	"github.com/jackc/pgtype"
 	"time"
 )
 
-type Timestamptz time.Time
+type Timestamptz struct{time.Time}
 
 const (
 	TimestamptzOID  = 1184
@@ -17,8 +18,7 @@ const (
 )
 
 func (v *Timestamptz) FromBinary(src []byte) ([]byte, error) {
-	const size = valueOffset + timestamptzSize
-	if len(src) < size {
+	if len(src) < valueOffset + timestamptzSize {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -27,7 +27,11 @@ func (v *Timestamptz) FromBinary(src []byte) ([]byte, error) {
 		return nil, &DecodeTypeErr{expected: TimestamptzOID, got: typ}
 	}
 
-	microsecSinceY2K := int64(binary.BigEndian.Uint64(src[valueOffset:]))
+	return v.fromBinary(src[valueOffset:])
+}
+
+func (v *Timestamptz) fromBinary(src []byte) ([]byte, error) {
+	microsecSinceY2K := int64(binary.BigEndian.Uint64(src))
 	switch microsecSinceY2K {
 	case inftyMicroSecOffset:
 		return nil, ErrInfinity
@@ -35,8 +39,18 @@ func (v *Timestamptz) FromBinary(src []byte) ([]byte, error) {
 		return nil, ErrInfinity
 	default:
 		microSecSinceUnixEpoch := microSecFromUnixEpochToY2K + microsecSinceY2K
-		*v = Timestamptz(time.Unix(microSecSinceUnixEpoch/1000000, (microSecSinceUnixEpoch%1000000)*1000))
+		v.Time = time.Unix(microSecSinceUnixEpoch/1000000, (microSecSinceUnixEpoch%1000000)*1000)
 	}
 
-	return src[size:], nil
+	return src[timestamptzSize:], nil
+}
+
+func (v *Timestamptz) DecodeBinary(_ *pgtype.ConnInfo, src[]byte) error {
+	if len(src) != timestamptzSize {
+		return ErrInvalidSrcLength
+	}
+
+	var err error
+	_, err = v.fromBinary(src)
+	return err
 }
