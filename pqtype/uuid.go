@@ -31,7 +31,7 @@ func (v *UUID) FromBinary(src []byte) ([]byte, error) {
 		return nil, ErrNullValue
 	}
 
-	return v.fromBinary(src)
+	return v.fromBinary(src[valueOffset:])
 }
 
 func (v *UUID) fromBinary(src []byte) ([]byte, error) {

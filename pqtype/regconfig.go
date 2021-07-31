@@ -54,5 +54,5 @@ func (v *Regconfig) FromBinary(src []byte) ([]byte, error) {
 
 func (v *Regconfig) fromBinary(src []byte) ([]byte, error) {
 	*v = Regconfig(binary.BigEndian.Uint32(src))
-	return src[int4Size:], nil
+	return src[regconfigSize:], nil
 }
