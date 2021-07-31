@@ -3,9 +3,7 @@ module github.com/Alisaien/pgq
 go 1.16
 
 require (
-	github.com/jackc/pgtype v1.8.0 // indirect
+	github.com/jackc/pgtype v1.8.0
 	github.com/json-iterator/go v1.1.11
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
-	github.com/stretchr/testify v1.7.0 // indirect
+	golang.org/x/tools v0.0.0-20200103221440-774c71fcf114
 )

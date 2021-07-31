@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	uuidSize     = 16
 	UUIDOID      = 2950
+	uuidSize     = 16
 )
 
 type UUID [16]byte
