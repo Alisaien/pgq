@@ -17,10 +17,8 @@ type UUID [16]byte
 
 // ----- UUID -----
 
-func (u *UUID) FromBinary(src []byte) ([]byte, error) {
-	const size = valueOffset + uuidSize
-
-	if len(src) < size {
+func (v *UUID) FromBinary(src []byte) ([]byte, error) {
+	if len(src) < valueOffset + uuidSize {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -29,22 +27,30 @@ func (u *UUID) FromBinary(src []byte) ([]byte, error) {
 		return nil, &DecodeTypeErr{expected: UUIDOID, got: typ}
 	}
 
-	copy(u[:], src[valueOffset:])
-	return src[size:], nil
+	if int32(binary.BigEndian.Uint32(src[sizeOffset:])) == -1 {
+		return nil, ErrNullValue
+	}
+
+	return v.fromBinary(src)
 }
 
-func (u UUID) MarshalJSON() ([]byte, error) {
-	return []byte(`"` + u.String() + `"`), nil
+func (v *UUID) fromBinary(src []byte) ([]byte, error) {
+	copy(v[:], src)
+	return src[uuidSize:], nil
 }
 
-func (u *UUID) UnmarshalJSON(src []byte) error {
+func (v UUID) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + v.String() + `"`), nil
+}
+
+func (v *UUID) UnmarshalJSON(src []byte) error {
 	var err error
 
-	*u, err = parseUUID(string(src))
+	*v, err = parseUUID(string(src))
 	return err
 }
 
-func (u UUID) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+func (v UUID) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 	var err error
 	*(*UUID)(ptr), err = parseUUID(iter.ReadString())
 
@@ -53,16 +59,16 @@ func (u UUID) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 	}
 }
 
-func (u UUID) Encode(_ unsafe.Pointer, stream *jsoniter.Stream) {
-	stream.WriteString(u.String())
+func (v UUID) Encode(_ unsafe.Pointer, stream *jsoniter.Stream) {
+	stream.WriteString(v.String())
 }
 
-func (u UUID) IsEmpty(_ unsafe.Pointer) bool {
+func (v UUID) IsEmpty(_ unsafe.Pointer) bool {
 	return false
 }
 
-func (u UUID) String() string {
-	return fmt.Sprintf("%x-%x-%x-%x-%x", u[0:4], u[4:6], u[6:8], u[8:10], u[10:16])
+func (v UUID) String() string {
+	return fmt.Sprintf("%x-%x-%x-%x-%x", v[0:4], v[4:6], v[6:8], v[8:10], v[10:16])
 }
 
 func parseUUID(src string) ([16]byte, error) {
@@ -126,10 +132,7 @@ func (ua *UUIDArray) FromBinary(src []byte) ([]byte, error) {
 
 	uuids := make(UUIDArray, header.Dims[0].Len)
 	for i := range uuids {
-		src, err = uuids[i].FromBinary(src)
-		if err != nil {
-			return nil, err
-		}
+		src, _ = uuids[i].fromBinary(src)
 	}
 
 	*ua = uuids
