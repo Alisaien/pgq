@@ -131,7 +131,12 @@ func (ua *UUIDArray) FromBinary(src []byte) ([]byte, error) {
 	}
 
 	uuids := make(UUIDArray, header.Dims[0].Len)
+	var ln Int4
 	for i := range uuids {
+		src, _ = ln.fromBinary(src)
+		if ln == -1 {
+			return nil, ErrNullValue
+		}
 		src, _ = uuids[i].fromBinary(src)
 	}
 
