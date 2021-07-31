@@ -96,7 +96,7 @@ const (
 type UUIDArray []UUID
 
 func (ua *UUIDArray) FromBinary(src []byte) ([]byte, error) {
-	const size = valueOffset + arrayHeaderSize
+	const size = valueOffset + arrayHeaderMinSize
 
 	if len(src) < size {
 		return nil, ErrInsufficientBytes

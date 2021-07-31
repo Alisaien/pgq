@@ -1,13 +1,13 @@
 package pqtype
 
 const (
-	arrayHeaderSize = 12
-	arrayDimsSize = 8
+	arrayHeaderMinSize = 12
+	arrayDimsSize      = 8
 )
 
 type ArrayHeader struct {
-	Null Bool
-	OID OID
+	HasNull Bool
+	ElemType OID
 	Dims []ArrayDims
 }
 
@@ -17,20 +17,21 @@ type ArrayDims struct {
 }
 
 func (ah *ArrayHeader) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < arrayHeaderSize {
+	if len(src) < arrayHeaderMinSize {
 		return nil, ErrInsufficientBytes
 	}
 
-	var dims Int4
-	src, _ = dims.fromBinary(src)
-	src, _ = ah.Null.fromBinary(src)
-	src, _ = ah.OID.fromBinary(src)
+	var ndim, hasNull Int4
+	src, _ = ndim.fromBinary(src)
+	src, _ = hasNull.fromBinary(src) // PG sends HasNull as int32
+	src, _ = ah.ElemType.fromBinary(src)
 
-	if dims > 0 {
-		ah.Dims = make([]ArrayDims, dims)
+	if ndim > 0 {
+		ah.Dims = make([]ArrayDims, ndim)
+		ah.HasNull = hasNull == 1
 	}
 
-	if len(src) < arrayHeaderSize+int(dims)*arrayDimsSize {
+	if len(src) < arrayHeaderMinSize+int(ndim)*arrayDimsSize {
 		return nil, ErrInsufficientBytes
 	}
 	for i := range ah.Dims {
