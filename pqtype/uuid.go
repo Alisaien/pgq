@@ -8,12 +8,14 @@ import (
 	"unsafe"
 )
 
+const (
+	uuidSize     = 16
+	UUIDOID      = 2950
+)
+
 type UUID [16]byte
 
-const (
-	uuidSize = 16
-	UUIDOID  = 2950
-)
+// ----- UUID -----
 
 func (u *UUID) FromBinary(src []byte) ([]byte, error) {
 	const size = valueOffset + uuidSize
@@ -83,4 +85,53 @@ func parseUUID(src string) ([16]byte, error) {
 
 	copy(dst[:], buf)
 	return dst, err
+}
+
+// ----- UUIDArray -----
+
+const (
+	UUIDArrayOID = 2951
+)
+
+type UUIDArray []UUID
+
+func (ua *UUIDArray) FromBinary(src []byte) ([]byte, error) {
+	const size = valueOffset + arrayHeaderSize
+
+	if len(src) < size {
+		return nil, ErrInsufficientBytes
+	}
+
+	typ := int32(binary.BigEndian.Uint32(src))
+	if typ != UUIDArrayOID {
+		return nil, &DecodeTypeErr{expected: UUIDArrayOID, got: typ}
+	}
+
+	var (
+		err    error
+		header ArrayHeader
+	)
+	src, err = header.FromBinary(src[valueOffset:])
+	if err != nil {
+		return nil, err
+	}
+
+	if len(header.Dims) == 0 {
+		*ua = UUIDArray{}
+		return src, nil
+	}
+	if len(header.Dims) > 1 {
+		return nil, ErrTooManyDims
+	}
+
+	uuids := make(UUIDArray, header.Dims[0].Len)
+	for i := range uuids {
+		src, err = uuids[i].FromBinary(src)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	*ua = uuids
+	return src, nil
 }

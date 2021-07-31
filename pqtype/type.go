@@ -6,7 +6,7 @@ const (
 	NameOID  = 19
 	Int8OID  = 20
 
-	OIDOID          = 26
+
 	TIDOID          = 27
 	XIDOID          = 28
 	CIDOID          = 29
@@ -53,7 +53,7 @@ const (
 	VarbitOID           = 1562
 	NumericOID          = 1700
 	RecordOID           = 2249
-	UUIDArrayOID        = 2951
+
 	JSONBOID            = 3802
 	JSONBArrayOID       = 3807
 	DaterangeOID        = 3912

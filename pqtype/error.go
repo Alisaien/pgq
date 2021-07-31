@@ -18,6 +18,8 @@ var ErrInsufficientBytes = errors.New("insufficient bytes left in src")
 
 var ErrInvalidSrcLength = errors.New("invalid valid length for type")
 
+var ErrTooManyDims = errors.New("too many dims in array")
+
 var ErrInfinity = errors.New("infinity is not a valid value")
 
 var ErrNullValue = errors.New("expected not null value")

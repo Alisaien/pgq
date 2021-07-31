@@ -27,7 +27,6 @@ func (v *Int4) FromBinary(src []byte) ([]byte, error) {
 	}
 
 	*v = Int4(binary.BigEndian.Uint32(src[valueOffset:]))
-
 	return src[size:], nil
 }
 
