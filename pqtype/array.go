@@ -21,24 +21,10 @@ func (ah *ArrayHeader) FromBinary(src []byte) ([]byte, error) {
 		return nil, ErrInsufficientBytes
 	}
 
-	var (
-		err error
-		dims Int4
-	)
-	src, err = dims.FromBinary(src)
-	if err != nil {
-		return nil, err
-	}
-
-	src, err = ah.Null.FromBinary(src)
-	if err != nil {
-		return nil, err
-	}
-
-	src, err = ah.OID.FromBinary(src)
-	if err != nil {
-		return nil, err
-	}
+	var dims Int4
+	src, _ = dims.fromBinary(src)
+	src, _ = ah.Null.fromBinary(src)
+	src, _ = ah.OID.fromBinary(src)
 
 	if dims > 0 {
 		ah.Dims = make([]ArrayDims, dims)
@@ -48,15 +34,8 @@ func (ah *ArrayHeader) FromBinary(src []byte) ([]byte, error) {
 		return nil, ErrInsufficientBytes
 	}
 	for i := range ah.Dims {
-		src, err = ah.Dims[i].Len.FromBinary(src)
-		if err != nil {
-			return nil, err
-		}
-
-		src, err = ah.Dims[i].LowerBound.FromBinary(src)
-		if err != nil {
-			return nil, err
-		}
+		src, _ = ah.Dims[i].Len.fromBinary(src)
+		src, _ = ah.Dims[i].LowerBound.fromBinary(src)
 	}
 
 	return src, nil

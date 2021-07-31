@@ -12,8 +12,7 @@ const (
 type OID uint32
 
 func (v *OID) FromBinary(src []byte) ([]byte, error) {
-	const size = valueOffset + oidSize
-	if len(src) < size {
+	if len(src) < valueOffset + oidSize {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -26,7 +25,10 @@ func (v *OID) FromBinary(src []byte) ([]byte, error) {
 		return nil, ErrNullValue
 	}
 
-	*v = OID(binary.BigEndian.Uint32(src[valueOffset:]))
+	return v.fromBinary(src[valueOffset:])
+}
 
-	return src[size:], nil
+func (v *OID) fromBinary(src []byte) ([]byte, error) {
+	*v = OID(binary.BigEndian.Uint32(src))
+	return src[oidSize:], nil
 }

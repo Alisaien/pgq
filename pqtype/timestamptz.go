@@ -27,6 +27,10 @@ func (v *Timestamptz) FromBinary(src []byte) ([]byte, error) {
 		return nil, &DecodeTypeErr{expected: TimestamptzOID, got: typ}
 	}
 
+	if int32(binary.BigEndian.Uint32(src[sizeOffset:])) == -1 {
+		return nil, ErrNullValue
+	}
+
 	return v.fromBinary(src[valueOffset:])
 }
 

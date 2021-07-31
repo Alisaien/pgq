@@ -10,9 +10,7 @@ const (
 )
 
 func (v *Bool) FromBinary(src []byte) ([]byte, error) {
-	const size = valueOffset + boolSize
-
-	if len(src) < size {
+	if len(src) < valueOffset + boolSize {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -25,7 +23,10 @@ func (v *Bool) FromBinary(src []byte) ([]byte, error) {
 		return nil, ErrNullValue
 	}
 
-	*v = src[valueOffset+1] == 1
+	return v.fromBinary(src[valueOffset:])
+}
 
-	return src[size:], nil
+func (v *Bool) fromBinary(src []byte) ([]byte, error) {
+	*v = src[0] == 1
+	return src[boolSize:], nil
 }

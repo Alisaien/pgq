@@ -12,8 +12,7 @@ const (
 )
 
 func (v *Int4) FromBinary(src []byte) ([]byte, error) {
-	const size = valueOffset + int4Size
-	if len(src) < size {
+	if len(src) < valueOffset + int4Size {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -26,8 +25,12 @@ func (v *Int4) FromBinary(src []byte) ([]byte, error) {
 		return nil, ErrNullValue
 	}
 
-	*v = Int4(binary.BigEndian.Uint32(src[valueOffset:]))
-	return src[size:], nil
+	return v.fromBinary(src[valueOffset:])
+}
+
+func (v *Int4) fromBinary(src []byte) ([]byte, error) {
+	*v = Int4(binary.BigEndian.Uint32(src))
+	return src[int4Size:], nil
 }
 
 func Int4Null(src []byte) (*Int4, []byte, error) {
