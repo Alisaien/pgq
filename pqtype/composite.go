@@ -1,8 +1,13 @@
 package pqtype
 
-type CompositeType struct {
-}
+import "encoding/binary"
 
-func (v CompositeType) ToBinary() {
+const compositeTypeHeaderSize = 4
 
+func CompositeTypeHeaderFromBinary(src []byte) (uint32, []byte, error) {
+	if len(src) < compositeTypeHeaderSize {
+		return 0, nil, ErrInsufficientBytes
+	}
+
+	return binary.BigEndian.Uint32(src), src[compositeTypeHeaderSize:], nil
 }
