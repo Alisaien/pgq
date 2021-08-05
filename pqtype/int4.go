@@ -13,20 +13,22 @@ const (
 )
 
 func (v *Int4) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < ValueOffset+int4Size {
-		return nil, ErrInsufficientBytes
+	err := LenCheck(src, int4Size)
+	if err != nil {
+		return nil, err
 	}
 
-	typ := int32(binary.BigEndian.Uint32(src))
-	if typ != Int4OID {
-		return nil, &DecodeTypeErr{expected: Int4OID, got: typ}
+	src, err = TypeCheck(src, Int4OID)
+	if err != nil {
+		return nil, err
 	}
 
-	if int32(binary.BigEndian.Uint32(src[SizeOffset:])) == -1 {
+	size, src := ValueSize(src)
+	if size == -1 {
 		return nil, ErrNullValue
 	}
 
-	return v.FromPureBinary(src[ValueOffset:])
+	return v.FromPureBinary(src)
 }
 
 func (v *Int4) FromPureBinary(src []byte) ([]byte, error) {
@@ -38,17 +40,23 @@ func (v Int4) ToPureBinary(buf []byte) []byte {
 	return pgio.AppendUint32(buf, uint32(v))
 }
 
-func Int4Null(src []byte) (*Int4, []byte, error) {
-	if len(src) < 8 {
-		return nil, nil, ErrInsufficientBytes
+func Int4FromBinary(src []byte) (*Int4, []byte, error) {
+	err := LenCheck(src, 0)
+	if err != nil {
+		return nil, nil, err
 	}
 
-	if int32(binary.BigEndian.Uint32(src[SizeOffset:])) == -1 {
-		return nil, src[ValueOffset:], nil
+	src, err = TypeCheck(src, Int4OID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	size, src := ValueSize(src)
+	if size == -1 {
+		return nil, src, nil
 	}
 
 	i := new(Int4)
-	var err error
-	src, err = i.FromBinary(src)
+	src, err = i.FromPureBinary(src)
 	return i, src, err
 }

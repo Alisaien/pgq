@@ -13,20 +13,22 @@ const (
 type OID uint32
 
 func (v *OID) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < ValueOffset+oidSize {
-		return nil, ErrInsufficientBytes
+	err := LenCheck(src, oidSize)
+	if err != nil {
+		return nil, err
 	}
 
-	typ := int32(binary.BigEndian.Uint32(src))
-	if typ != OIDOID {
-		return nil, &DecodeTypeErr{expected: OIDOID, got: typ}
+	src, err = TypeCheck(src, OIDOID)
+	if err != nil {
+		return nil, err
 	}
 
-	if int32(binary.BigEndian.Uint32(src[SizeOffset:])) == -1 {
+	size, src := ValueSize(src)
+	if size == -1 {
 		return nil, ErrNullValue
 	}
 
-	return v.FromPureBinary(src[ValueOffset:])
+	return v.FromPureBinary(src)
 }
 
 func (v *OID) FromPureBinary(src []byte) ([]byte, error) {

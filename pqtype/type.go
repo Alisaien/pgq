@@ -66,7 +66,5 @@ const (
 )
 
 const (
-	typeOffset  = 0
-	SizeOffset  = typeOffset + 4
-	ValueOffset = SizeOffset + 4
+	valueHeaderSize = 8
 )

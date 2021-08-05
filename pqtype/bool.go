@@ -1,7 +1,6 @@
 package pqtype
 
 import (
-	"encoding/binary"
 	"github.com/jackc/pgio"
 )
 
@@ -13,20 +12,22 @@ const (
 )
 
 func (v *Bool) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < ValueOffset+boolSize {
-		return nil, ErrInsufficientBytes
+	err := LenCheck(src, boolSize)
+	if err != nil {
+		return nil, err
 	}
 
-	typ := int32(binary.BigEndian.Uint32(src))
-	if typ != BoolOID {
-		return nil, &DecodeTypeErr{expected: BoolOID, got: typ}
+	src, err = TypeCheck(src, BoolOID)
+	if err != nil {
+		return nil, err
 	}
 
-	if int32(binary.BigEndian.Uint32(src[SizeOffset:])) == -1 {
+	size, src := ValueSize(src)
+	if size == -1 {
 		return nil, ErrNullValue
 	}
 
-	return v.FromPureBinary(src[ValueOffset:])
+	return v.FromPureBinary(src)
 }
 
 func (v *Bool) FromPureBinary(src []byte) ([]byte, error) {

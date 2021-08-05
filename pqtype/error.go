@@ -6,8 +6,8 @@ import (
 )
 
 type DecodeTypeErr struct {
-	expected int32
-	got      int32
+	expected OID
+	got      OID
 }
 
 func (e *DecodeTypeErr) Error() string {

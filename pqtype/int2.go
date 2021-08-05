@@ -10,37 +10,46 @@ const (
 )
 
 func (v *Int2) FromBinary(src []byte) ([]byte, error) {
-	const size = ValueOffset + int2Size
-
-	if len(src) < size {
-		return nil, ErrInsufficientBytes
+	err := LenCheck(src, int4Size)
+	if err != nil {
+		return nil, err
 	}
 
-	typ := int32(binary.BigEndian.Uint32(src))
-	if typ != Int2OID {
-		return nil, &DecodeTypeErr{expected: Int4OID, got: typ}
+	src, err = TypeCheck(src, Int4OID)
+	if err != nil {
+		return nil, err
 	}
 
-	if int32(binary.BigEndian.Uint32(src[SizeOffset:])) == -1 {
+	size, src := ValueSize(src)
+	if size == -1 {
 		return nil, ErrNullValue
 	}
 
-	*v = Int2(binary.BigEndian.Uint16(src[ValueOffset:]))
+	return v.FromPureBinary(src)
+}
 
-	return src[size:], nil
+func (v *Int2) FromPureBinary(src []byte) ([]byte, error) {
+	*v = Int2(binary.BigEndian.Uint16(src))
+	return src[int2Size:], nil
 }
 
 func Int2Null(src []byte) (*Int2, []byte, error) {
-	if len(src) < 8 {
-		return nil, nil, ErrInsufficientBytes
+	err := LenCheck(src, 0)
+	if err != nil {
+		return nil, nil, err
 	}
 
-	if int32(binary.BigEndian.Uint32(src[4:])) == -1 {
-		return nil, src[8:], nil
+	src, err = TypeCheck(src, Int2OID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	size, src := ValueSize(src)
+	if size == -1 {
+		return nil, src, nil
 	}
 
 	i := new(Int2)
-	var err error
-	src, err = i.FromBinary(src)
+	src, err = i.FromPureBinary(src)
 	return i, src, err
 }

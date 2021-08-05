@@ -1,29 +1,32 @@
 package pqtype
 
-import "encoding/binary"
-
 type Text string
 
 const TextOID = 25
 
-func (t *Text) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < ValueOffset {
-		return nil, ErrInsufficientBytes
+func (v *Text) FromBinary(src []byte) ([]byte, error) {
+	err := LenCheck(src, 0)
+	if err != nil {
+		return nil, err
 	}
 
-	typ := int32(binary.BigEndian.Uint32(src))
-	if typ != TextOID {
-		return nil, &DecodeTypeErr{expected: TextOID, got: typ}
+	src, err = TypeCheck(src, TextOID)
+	if err != nil {
+		return nil, err
 	}
 
-	textSize := int32(binary.BigEndian.Uint32(src[SizeOffset:]))
-	if textSize == -1 {
+	return v.FromPureBinary(src)
+}
+
+func (v *Text) FromPureBinary(src []byte) ([]byte, error) {
+	size, src := ValueSize(src)
+	if size == -1 {
 		return nil, ErrNullValue
 	}
 
-	buf := make([]byte, textSize)
-	copy(buf, src[ValueOffset:])
-	*t = Text(buf)
+	buf := make([]byte, size)
+	copy(buf, src)
+	*v = Text(buf)
 
-	return src[ValueOffset+textSize:], nil
+	return src[size:], nil
 }

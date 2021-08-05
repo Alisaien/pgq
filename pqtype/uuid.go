@@ -1,7 +1,6 @@
 package pqtype
 
 import (
-	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"github.com/jackc/pgio"
@@ -19,20 +18,22 @@ type UUID [16]byte
 // ----- UUID -----
 
 func (v *UUID) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < ValueOffset+uuidSize {
-		return nil, ErrInsufficientBytes
+	err := LenCheck(src, uuidSize)
+	if err != nil {
+		return nil, err
 	}
 
-	typ := int32(binary.BigEndian.Uint32(src))
-	if typ != UUIDOID {
-		return nil, &DecodeTypeErr{expected: UUIDOID, got: typ}
+	src, err = TypeCheck(src, UUIDOID)
+	if err != nil {
+		return nil, err
 	}
 
-	if int32(binary.BigEndian.Uint32(src[SizeOffset:])) == -1 {
+	size, src := ValueSize(src)
+	if size == -1 {
 		return nil, ErrNullValue
 	}
 
-	return v.FromPureBinary(src[ValueOffset:])
+	return v.FromPureBinary(src)
 }
 
 func (v *UUID) FromPureBinary(src []byte) ([]byte, error) {
@@ -113,22 +114,18 @@ const (
 type UUIDArray []UUID
 
 func (v *UUIDArray) FromBinary(src []byte) ([]byte, error) {
-	const size = ValueOffset + arrayHeaderMinSize
-
-	if len(src) < size {
-		return nil, ErrInsufficientBytes
+	err := LenCheck(src, arrayHeaderMinSize)
+	if err != nil {
+		return nil, err
 	}
 
-	typ := int32(binary.BigEndian.Uint32(src))
-	if typ != UUIDArrayOID {
-		return nil, &DecodeTypeErr{expected: UUIDArrayOID, got: typ}
+	src, err = TypeCheck(src, UUIDArrayOID)
+	if err != nil {
+		return nil, err
 	}
 
-	var (
-		err    error
-		header ArrayHeader
-	)
-	src, err = header.FromBinary(src[ValueOffset:])
+	var header ArrayHeader
+	src, err = header.FromBinary(src[valueHeaderSize:])
 	if err != nil {
 		return nil, err
 	}
