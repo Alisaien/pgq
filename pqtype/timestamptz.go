@@ -18,7 +18,7 @@ const (
 )
 
 func (v *Timestamptz) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < valueOffset+timestamptzSize {
+	if len(src) < ValueOffset+timestamptzSize {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -27,11 +27,11 @@ func (v *Timestamptz) FromBinary(src []byte) ([]byte, error) {
 		return nil, &DecodeTypeErr{expected: TimestamptzOID, got: typ}
 	}
 
-	if int32(binary.BigEndian.Uint32(src[sizeOffset:])) == -1 {
+	if int32(binary.BigEndian.Uint32(src[SizeOffset:])) == -1 {
 		return nil, ErrNullValue
 	}
 
-	return v.FromPureBinary(src[valueOffset:])
+	return v.FromPureBinary(src[ValueOffset:])
 }
 
 func (v *Timestamptz) FromPureBinary(src []byte) ([]byte, error) {

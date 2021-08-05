@@ -10,7 +10,7 @@ const (
 )
 
 func (v *Int2) FromBinary(src []byte) ([]byte, error) {
-	const size = valueOffset + int2Size
+	const size = ValueOffset + int2Size
 
 	if len(src) < size {
 		return nil, ErrInsufficientBytes
@@ -21,11 +21,11 @@ func (v *Int2) FromBinary(src []byte) ([]byte, error) {
 		return nil, &DecodeTypeErr{expected: Int4OID, got: typ}
 	}
 
-	if int32(binary.BigEndian.Uint32(src[sizeOffset:])) == -1 {
+	if int32(binary.BigEndian.Uint32(src[SizeOffset:])) == -1 {
 		return nil, ErrNullValue
 	}
 
-	*v = Int2(binary.BigEndian.Uint16(src[valueOffset:]))
+	*v = Int2(binary.BigEndian.Uint16(src[ValueOffset:]))
 
 	return src[size:], nil
 }

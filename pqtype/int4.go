@@ -13,7 +13,7 @@ const (
 )
 
 func (v *Int4) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < valueOffset+int4Size {
+	if len(src) < ValueOffset+int4Size {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -22,11 +22,11 @@ func (v *Int4) FromBinary(src []byte) ([]byte, error) {
 		return nil, &DecodeTypeErr{expected: Int4OID, got: typ}
 	}
 
-	if int32(binary.BigEndian.Uint32(src[sizeOffset:])) == -1 {
+	if int32(binary.BigEndian.Uint32(src[SizeOffset:])) == -1 {
 		return nil, ErrNullValue
 	}
 
-	return v.FromPureBinary(src[valueOffset:])
+	return v.FromPureBinary(src[ValueOffset:])
 }
 
 func (v *Int4) FromPureBinary(src []byte) ([]byte, error) {
@@ -43,8 +43,8 @@ func Int4Null(src []byte) (*Int4, []byte, error) {
 		return nil, nil, ErrInsufficientBytes
 	}
 
-	if int32(binary.BigEndian.Uint32(src[sizeOffset:])) == -1 {
-		return nil, src[valueOffset:], nil
+	if int32(binary.BigEndian.Uint32(src[SizeOffset:])) == -1 {
+		return nil, src[ValueOffset:], nil
 	}
 
 	i := new(Int4)

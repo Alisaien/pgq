@@ -37,7 +37,7 @@ const (
 )
 
 func (v *Regconfig) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < valueOffset+regconfigSize {
+	if len(src) < ValueOffset+regconfigSize {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -46,11 +46,11 @@ func (v *Regconfig) FromBinary(src []byte) ([]byte, error) {
 		return nil, &DecodeTypeErr{expected: RegconfigOID, got: typ}
 	}
 
-	if int32(binary.BigEndian.Uint32(src[sizeOffset:])) == -1 {
+	if int32(binary.BigEndian.Uint32(src[SizeOffset:])) == -1 {
 		return nil, ErrNullValue
 	}
 
-	return v.FromPureBinary(src[valueOffset:])
+	return v.FromPureBinary(src[ValueOffset:])
 }
 
 func (v *Regconfig) FromPureBinary(src []byte) ([]byte, error) {

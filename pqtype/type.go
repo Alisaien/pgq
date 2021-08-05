@@ -67,6 +67,6 @@ const (
 
 const (
 	typeOffset  = 0
-	sizeOffset  = typeOffset + 4
-	valueOffset = sizeOffset + 4
+	SizeOffset  = typeOffset + 4
+	ValueOffset = SizeOffset + 4
 )

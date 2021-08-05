@@ -19,7 +19,7 @@ type UUID [16]byte
 // ----- UUID -----
 
 func (v *UUID) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < valueOffset+uuidSize {
+	if len(src) < ValueOffset+uuidSize {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -28,11 +28,11 @@ func (v *UUID) FromBinary(src []byte) ([]byte, error) {
 		return nil, &DecodeTypeErr{expected: UUIDOID, got: typ}
 	}
 
-	if int32(binary.BigEndian.Uint32(src[sizeOffset:])) == -1 {
+	if int32(binary.BigEndian.Uint32(src[SizeOffset:])) == -1 {
 		return nil, ErrNullValue
 	}
 
-	return v.FromPureBinary(src[valueOffset:])
+	return v.FromPureBinary(src[ValueOffset:])
 }
 
 func (v *UUID) FromPureBinary(src []byte) ([]byte, error) {
@@ -113,7 +113,7 @@ const (
 type UUIDArray []UUID
 
 func (v *UUIDArray) FromBinary(src []byte) ([]byte, error) {
-	const size = valueOffset + arrayHeaderMinSize
+	const size = ValueOffset + arrayHeaderMinSize
 
 	if len(src) < size {
 		return nil, ErrInsufficientBytes
@@ -128,7 +128,7 @@ func (v *UUIDArray) FromBinary(src []byte) ([]byte, error) {
 		err    error
 		header ArrayHeader
 	)
-	src, err = header.FromBinary(src[valueOffset:])
+	src, err = header.FromBinary(src[ValueOffset:])
 	if err != nil {
 		return nil, err
 	}

@@ -7,7 +7,7 @@ type Text string
 const TextOID = 25
 
 func (t *Text) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < valueOffset {
+	if len(src) < ValueOffset {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -16,14 +16,14 @@ func (t *Text) FromBinary(src []byte) ([]byte, error) {
 		return nil, &DecodeTypeErr{expected: TextOID, got: typ}
 	}
 
-	textSize := int32(binary.BigEndian.Uint32(src[sizeOffset:]))
+	textSize := int32(binary.BigEndian.Uint32(src[SizeOffset:]))
 	if textSize == -1 {
 		return nil, ErrNullValue
 	}
 
 	buf := make([]byte, textSize)
-	copy(buf, src[valueOffset:])
+	copy(buf, src[ValueOffset:])
 	*t = Text(buf)
 
-	return src[valueOffset+textSize:], nil
+	return src[ValueOffset+textSize:], nil
 }
