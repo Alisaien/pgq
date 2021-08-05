@@ -31,10 +31,10 @@ func (v *Timestamptz) FromBinary(src []byte) ([]byte, error) {
 		return nil, ErrNullValue
 	}
 
-	return v.fromBinary(src[valueOffset:])
+	return v.FromPureBinary(src[valueOffset:])
 }
 
-func (v *Timestamptz) fromBinary(src []byte) ([]byte, error) {
+func (v *Timestamptz) FromPureBinary(src []byte) ([]byte, error) {
 	microsecSinceY2K := int64(binary.BigEndian.Uint64(src))
 	switch microsecSinceY2K {
 	case inftyMicroSecOffset:
@@ -55,6 +55,6 @@ func (v *Timestamptz) DecodeBinary(_ *pgtype.ConnInfo, src []byte) error {
 	}
 
 	var err error
-	_, err = v.fromBinary(src)
+	_, err = v.FromPureBinary(src)
 	return err
 }

@@ -1,6 +1,9 @@
 package pqtype
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"github.com/jackc/pgio"
+)
 
 type Bool bool
 
@@ -10,7 +13,7 @@ const (
 )
 
 func (v *Bool) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < valueOffset + boolSize {
+	if len(src) < valueOffset+boolSize {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -23,10 +26,24 @@ func (v *Bool) FromBinary(src []byte) ([]byte, error) {
 		return nil, ErrNullValue
 	}
 
-	return v.fromBinary(src[valueOffset:])
+	return v.FromPureBinary(src[valueOffset:])
 }
 
-func (v *Bool) fromBinary(src []byte) ([]byte, error) {
+func (v *Bool) FromPureBinary(src []byte) ([]byte, error) {
 	*v = src[0] == 1
 	return src[boolSize:], nil
+}
+
+func (v Bool) ToBinary(buf []byte) []byte {
+	buf = pgio.AppendUint32(buf, BoolOID)
+	buf = pgio.AppendUint32(buf, boolSize)
+	return v.ToPureBinary(buf)
+}
+
+func (v Bool) ToPureBinary(buf []byte) []byte {
+	if v {
+		return append(buf, 1)
+	} else {
+		return append(buf, 0)
+	}
 }

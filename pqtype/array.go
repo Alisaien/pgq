@@ -6,13 +6,13 @@ const (
 )
 
 type ArrayHeader struct {
-	HasNull Bool
+	HasNull  Bool
 	ElemType OID
-	Dims []ArrayDims
+	Dims     []ArrayDims
 }
 
 type ArrayDims struct {
-	Len Int4
+	Len        Int4
 	LowerBound Int4
 }
 
@@ -22,9 +22,9 @@ func (ah *ArrayHeader) FromBinary(src []byte) ([]byte, error) {
 	}
 
 	var ndim, hasNull Int4
-	src, _ = ndim.fromBinary(src)
-	src, _ = hasNull.fromBinary(src) // PG sends HasNull as int32
-	src, _ = ah.ElemType.fromBinary(src)
+	src, _ = ndim.FromPureBinary(src)
+	src, _ = hasNull.FromPureBinary(src) // PG sends HasNull as int32
+	src, _ = ah.ElemType.FromPureBinary(src)
 
 	if ndim > 0 {
 		ah.Dims = make([]ArrayDims, ndim)
@@ -35,8 +35,8 @@ func (ah *ArrayHeader) FromBinary(src []byte) ([]byte, error) {
 		return nil, ErrInsufficientBytes
 	}
 	for i := range ah.Dims {
-		src, _ = ah.Dims[i].Len.fromBinary(src)
-		src, _ = ah.Dims[i].LowerBound.fromBinary(src)
+		src, _ = ah.Dims[i].Len.FromPureBinary(src)
+		src, _ = ah.Dims[i].LowerBound.FromPureBinary(src)
 	}
 
 	return src, nil

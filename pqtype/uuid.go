@@ -4,13 +4,14 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"github.com/jackc/pgio"
 	jsoniter "github.com/json-iterator/go"
 	"unsafe"
 )
 
 const (
-	UUIDOID      = 2950
-	uuidSize     = 16
+	UUIDOID  = 2950
+	uuidSize = 16
 )
 
 type UUID [16]byte
@@ -18,7 +19,7 @@ type UUID [16]byte
 // ----- UUID -----
 
 func (v *UUID) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < valueOffset + uuidSize {
+	if len(src) < valueOffset+uuidSize {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -31,12 +32,22 @@ func (v *UUID) FromBinary(src []byte) ([]byte, error) {
 		return nil, ErrNullValue
 	}
 
-	return v.fromBinary(src[valueOffset:])
+	return v.FromPureBinary(src[valueOffset:])
 }
 
-func (v *UUID) fromBinary(src []byte) ([]byte, error) {
+func (v *UUID) FromPureBinary(src []byte) ([]byte, error) {
 	copy(v[:], src)
 	return src[uuidSize:], nil
+}
+
+func (v UUID) ToBinary(buf []byte) []byte {
+	buf = pgio.AppendUint32(buf, UUIDOID)
+	buf = pgio.AppendUint32(buf, uuidSize)
+	return v.ToPureBinary(buf)
+}
+
+func (v UUID) ToPureBinary(buf []byte) []byte {
+	return append(buf, v[:]...)
 }
 
 func (v UUID) MarshalJSON() ([]byte, error) {
@@ -93,7 +104,7 @@ func parseUUID(src string) ([16]byte, error) {
 	return dst, err
 }
 
-// ----- UUIDArray -----
+// ---------- UUIDArray ----------
 
 const (
 	UUIDArrayOID = 2951
@@ -101,7 +112,7 @@ const (
 
 type UUIDArray []UUID
 
-func (ua *UUIDArray) FromBinary(src []byte) ([]byte, error) {
+func (v *UUIDArray) FromBinary(src []byte) ([]byte, error) {
 	const size = valueOffset + arrayHeaderMinSize
 
 	if len(src) < size {
@@ -123,7 +134,7 @@ func (ua *UUIDArray) FromBinary(src []byte) ([]byte, error) {
 	}
 
 	if len(header.Dims) == 0 {
-		*ua = UUIDArray{}
+		*v = UUIDArray{}
 		return src, nil
 	}
 	if len(header.Dims) > 1 {
@@ -133,13 +144,41 @@ func (ua *UUIDArray) FromBinary(src []byte) ([]byte, error) {
 	uuids := make(UUIDArray, header.Dims[0].Len)
 	var ln Int4
 	for i := range uuids {
-		src, _ = ln.fromBinary(src)
+		src, _ = ln.FromPureBinary(src)
 		if ln == -1 {
 			return nil, ErrNullValue
 		}
-		src, _ = uuids[i].fromBinary(src)
+		src, _ = uuids[i].FromPureBinary(src)
 	}
 
-	*ua = uuids
+	*v = uuids
 	return src, nil
+}
+
+func (v UUIDArray) ToBinary(buf []byte) []byte {
+	buf = pgio.AppendUint32(buf, UUIDArrayOID)
+	sp := len(buf)
+	buf = append(buf, 0, 0, 0, 0)
+	buf = v.ToPureBinary(buf)
+	pgio.SetInt32(buf[sp:], int32(len(buf)-sp-4))
+
+	return buf
+}
+
+func (v UUIDArray) ToPureBinary(buf []byte) []byte {
+	buf = pgio.AppendUint32(buf, 1) // array dimensions
+	buf = pgio.AppendUint32(buf, 0) // contains null
+	buf = pgio.AppendUint32(buf, UUIDOID)
+	buf = pgio.AppendUint32(buf, uint32(len(v)))
+	buf = pgio.AppendUint32(buf, 0) // lower bound (always 0)
+
+	var sp int
+	for i := range v {
+		sp = len(buf)
+		buf = append(buf, 0, 0, 0, 0)
+		buf = v[i].ToPureBinary(buf)
+		pgio.SetInt32(buf[sp:], int32(len(buf)-sp-4))
+	}
+
+	return buf
 }

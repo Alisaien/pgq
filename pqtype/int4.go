@@ -2,6 +2,7 @@ package pqtype
 
 import (
 	"encoding/binary"
+	"github.com/jackc/pgio"
 )
 
 type Int4 int32
@@ -12,7 +13,7 @@ const (
 )
 
 func (v *Int4) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < valueOffset + int4Size {
+	if len(src) < valueOffset+int4Size {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -25,12 +26,16 @@ func (v *Int4) FromBinary(src []byte) ([]byte, error) {
 		return nil, ErrNullValue
 	}
 
-	return v.fromBinary(src[valueOffset:])
+	return v.FromPureBinary(src[valueOffset:])
 }
 
-func (v *Int4) fromBinary(src []byte) ([]byte, error) {
+func (v *Int4) FromPureBinary(src []byte) ([]byte, error) {
 	*v = Int4(binary.BigEndian.Uint32(src))
 	return src[int4Size:], nil
+}
+
+func (v Int4) ToPureBinary(buf []byte) []byte {
+	return pgio.AppendUint32(buf, uint32(v))
 }
 
 func Int4Null(src []byte) (*Int4, []byte, error) {

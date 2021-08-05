@@ -2,6 +2,7 @@ package pqtype
 
 import (
 	"encoding/binary"
+	"github.com/jackc/pgio"
 )
 
 const (
@@ -12,7 +13,7 @@ const (
 type OID uint32
 
 func (v *OID) FromBinary(src []byte) ([]byte, error) {
-	if len(src) < valueOffset + oidSize {
+	if len(src) < valueOffset+oidSize {
 		return nil, ErrInsufficientBytes
 	}
 
@@ -25,10 +26,14 @@ func (v *OID) FromBinary(src []byte) ([]byte, error) {
 		return nil, ErrNullValue
 	}
 
-	return v.fromBinary(src[valueOffset:])
+	return v.FromPureBinary(src[valueOffset:])
 }
 
-func (v *OID) fromBinary(src []byte) ([]byte, error) {
+func (v *OID) FromPureBinary(src []byte) ([]byte, error) {
 	*v = OID(binary.BigEndian.Uint32(src))
 	return src[oidSize:], nil
+}
+
+func (v OID) ToPureBinary(buf []byte) []byte {
+	return pgio.AppendUint32(buf, uint32(v))
 }

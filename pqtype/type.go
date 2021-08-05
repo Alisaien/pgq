@@ -6,7 +6,6 @@ const (
 	NameOID  = 19
 	Int8OID  = 20
 
-
 	TIDOID          = 27
 	XIDOID          = 28
 	CIDOID          = 29
@@ -54,16 +53,16 @@ const (
 	NumericOID          = 1700
 	RecordOID           = 2249
 
-	JSONBOID            = 3802
-	JSONBArrayOID       = 3807
-	DaterangeOID        = 3912
-	Int4rangeOID        = 3904
-	NumrangeOID         = 3906
-	TsrangeOID          = 3908
-	TsrangeArrayOID     = 3909
-	TstzrangeOID        = 3910
-	TstzrangeArrayOID   = 3911
-	Int8rangeOID        = 3926
+	JSONBOID          = 3802
+	JSONBArrayOID     = 3807
+	DaterangeOID      = 3912
+	Int4rangeOID      = 3904
+	NumrangeOID       = 3906
+	TsrangeOID        = 3908
+	TsrangeArrayOID   = 3909
+	TstzrangeOID      = 3910
+	TstzrangeArrayOID = 3911
+	Int8rangeOID      = 3926
 )
 
 const (

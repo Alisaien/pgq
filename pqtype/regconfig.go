@@ -10,6 +10,7 @@ const (
 )
 
 type Regconfig int32
+
 const (
 	Arabic     Regconfig = 13068
 	Danish     Regconfig = 13070
@@ -49,10 +50,10 @@ func (v *Regconfig) FromBinary(src []byte) ([]byte, error) {
 		return nil, ErrNullValue
 	}
 
-	return v.fromBinary(src[valueOffset:])
+	return v.FromPureBinary(src[valueOffset:])
 }
 
-func (v *Regconfig) fromBinary(src []byte) ([]byte, error) {
+func (v *Regconfig) FromPureBinary(src []byte) ([]byte, error) {
 	*v = Regconfig(binary.BigEndian.Uint32(src))
 	return src[regconfigSize:], nil
 }
