@@ -121,7 +121,7 @@ const (
 
 type UUIDArray []UUID
 
-func (v *UUIDArray) DecodeValue(src []byte) ([]byte, error) {
+func (v *UUIDArray) DecodeType(src []byte) ([]byte, error) {
 	err := LenCheck(src, arrayHeaderMinSize)
 	if err != nil {
 		return nil, err

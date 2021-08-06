@@ -54,7 +54,7 @@ func (v Int2) Write(buf []byte) []byte {
 	return pgio.AppendUint16(buf, uint16(v))
 }
 
-func Int2Null(src []byte) (*Int2, []byte, error) {
+func DecodeInt2(src []byte) (*Int2, []byte, error) {
 	err := LenCheck(src, 0)
 	if err != nil {
 		return nil, nil, err

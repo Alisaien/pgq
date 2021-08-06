@@ -54,7 +54,7 @@ func (v Int4) Write(buf []byte) []byte {
 	return pgio.AppendUint32(buf, uint32(v))
 }
 
-func Int4FromBinary(src []byte) (*Int4, []byte, error) {
+func DecodeInt4(src []byte) (*Int4, []byte, error) {
 	err := LenCheck(src, 0)
 	if err != nil {
 		return nil, nil, err
@@ -71,6 +71,6 @@ func Int4FromBinary(src []byte) (*Int4, []byte, error) {
 	}
 
 	v := new(Int4)
-	v.Read(src)
-	return v, src[int4Size:], err
+	src, _ = v.Read(src)
+	return v, src, err
 }
