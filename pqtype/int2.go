@@ -1,6 +1,9 @@
 package pqtype
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"github.com/jackc/pgio"
+)
 
 type Int2 int16
 
@@ -9,7 +12,7 @@ const (
 	int2Size = 2
 )
 
-func (v *Int2) FromBinary(src []byte) ([]byte, error) {
+func (v *Int2) DecodeType(src []byte) ([]byte, error) {
 	err := LenCheck(src, int4Size)
 	if err != nil {
 		return nil, err
@@ -20,17 +23,35 @@ func (v *Int2) FromBinary(src []byte) ([]byte, error) {
 		return nil, err
 	}
 
+	return v.DecodeValue(src)
+}
+
+func (v *Int2) DecodeValue(src []byte) ([]byte, error) {
 	size, src := ValueSize(src)
 	if size == -1 {
 		return nil, ErrNullValue
 	}
 
-	return v.FromPureBinary(src)
+	return v.Read(src)
 }
 
-func (v *Int2) FromPureBinary(src []byte) ([]byte, error) {
+func (v *Int2) Read(src []byte) ([]byte, error) {
 	*v = Int2(binary.BigEndian.Uint16(src))
 	return src[int2Size:], nil
+}
+
+func (v Int2) EncodeType(buf []byte) []byte {
+	buf = pgio.AppendUint32(buf, Int2OID)
+	return v.EncodeValue(buf)
+}
+
+func (v Int2) EncodeValue(buf []byte) []byte {
+	buf = pgio.AppendUint32(buf, int2Size)
+	return v.Write(buf)
+}
+
+func (v Int2) Write(buf []byte) []byte {
+	return pgio.AppendUint16(buf, uint16(v))
 }
 
 func Int2Null(src []byte) (*Int2, []byte, error) {
@@ -49,7 +70,7 @@ func Int2Null(src []byte) (*Int2, []byte, error) {
 		return nil, src, nil
 	}
 
-	i := new(Int2)
-	src, err = i.FromPureBinary(src)
-	return i, src, err
+	v := new(Int2)
+	src, _ = v.Read(src)
+	return v, src, err
 }

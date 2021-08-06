@@ -1,10 +1,19 @@
 package pqtype
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+)
 
-type Decoder interface {
-	FromBinary(src []byte) ([]byte, error)
-	FromPureBinary(src []byte) ([]byte, error)
+type TypeDecoder interface {
+	DecodeType(src []byte) ([]byte, error)
+}
+
+type ValueDecoder interface {
+	DecodeValue(src []byte) ([]byte, error)
+}
+
+type Reader interface {
+	Read(src []byte) ([]byte, error)
 }
 
 func LenCheck(src []byte, size int) error {
@@ -16,12 +25,12 @@ func LenCheck(src []byte, size int) error {
 
 func TypeCheck(src []byte, oid OID) ([]byte, error) {
 	var typ OID
-	src, _ = typ.FromPureBinary(src)
+	typ.Read(src)
 	if typ != oid {
 		return nil, &DecodeTypeErr{expected: oid, got: typ}
 	}
 
-	return src, nil
+	return src[oidSize:], nil
 }
 
 func ValueSize(src []byte) (int32, []byte) {

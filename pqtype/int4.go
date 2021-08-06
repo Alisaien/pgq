@@ -12,7 +12,7 @@ const (
 	int4Size = 4
 )
 
-func (v *Int4) FromBinary(src []byte) ([]byte, error) {
+func (v *Int4) DecodeType(src []byte) ([]byte, error) {
 	err := LenCheck(src, int4Size)
 	if err != nil {
 		return nil, err
@@ -23,20 +23,34 @@ func (v *Int4) FromBinary(src []byte) ([]byte, error) {
 		return nil, err
 	}
 
+	return v.DecodeValue(src)
+}
+
+func (v *Int4) DecodeValue(src []byte) ([]byte, error) {
 	size, src := ValueSize(src)
 	if size == -1 {
 		return nil, ErrNullValue
 	}
 
-	return v.FromPureBinary(src)
+	return v.Read(src)
 }
 
-func (v *Int4) FromPureBinary(src []byte) ([]byte, error) {
+func (v *Int4) Read(src []byte) ([]byte, error) {
 	*v = Int4(binary.BigEndian.Uint32(src))
 	return src[int4Size:], nil
 }
 
-func (v Int4) ToPureBinary(buf []byte) []byte {
+func (v Int4) EncodeType(buf []byte) []byte {
+	buf = pgio.AppendUint32(buf, Int4OID)
+	return v.EncodeValue(buf)
+}
+
+func (v Int4) EncodeValue(buf []byte) []byte {
+	buf = pgio.AppendUint32(buf, int4Size)
+	return v.Write(buf)
+}
+
+func (v Int4) Write(buf []byte) []byte {
 	return pgio.AppendUint32(buf, uint32(v))
 }
 
@@ -56,7 +70,7 @@ func Int4FromBinary(src []byte) (*Int4, []byte, error) {
 		return nil, src, nil
 	}
 
-	i := new(Int4)
-	src, err = i.FromPureBinary(src)
-	return i, src, err
+	v := new(Int4)
+	v.Read(src)
+	return v, src[int4Size:], err
 }

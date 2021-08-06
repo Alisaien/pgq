@@ -12,7 +12,7 @@ const (
 
 type OID uint32
 
-func (v *OID) FromBinary(src []byte) ([]byte, error) {
+func (v *OID) DecodeType(src []byte) ([]byte, error) {
 	err := LenCheck(src, oidSize)
 	if err != nil {
 		return nil, err
@@ -23,19 +23,23 @@ func (v *OID) FromBinary(src []byte) ([]byte, error) {
 		return nil, err
 	}
 
+	return v.DecodeValue(src)
+}
+
+func (v *OID) DecodeValue(src []byte) ([]byte, error) {
 	size, src := ValueSize(src)
 	if size == -1 {
 		return nil, ErrNullValue
 	}
 
-	return v.FromPureBinary(src)
+	return v.Read(src)
 }
 
-func (v *OID) FromPureBinary(src []byte) ([]byte, error) {
+func (v *OID) Read(src []byte) ([]byte, error) {
 	*v = OID(binary.BigEndian.Uint32(src))
 	return src[oidSize:], nil
 }
 
-func (v OID) ToPureBinary(buf []byte) []byte {
+func (v OID) Write(buf []byte) []byte {
 	return pgio.AppendUint32(buf, uint32(v))
 }

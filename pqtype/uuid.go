@@ -17,7 +17,7 @@ type UUID [16]byte
 
 // ----- UUID -----
 
-func (v *UUID) FromBinary(src []byte) ([]byte, error) {
+func (v *UUID) DecodeType(src []byte) ([]byte, error) {
 	err := LenCheck(src, uuidSize)
 	if err != nil {
 		return nil, err
@@ -28,26 +28,34 @@ func (v *UUID) FromBinary(src []byte) ([]byte, error) {
 		return nil, err
 	}
 
+	return v.DecodeValue(src)
+}
+
+func (v *UUID) DecodeValue(src []byte) ([]byte, error) {
 	size, src := ValueSize(src)
 	if size == -1 {
 		return nil, ErrNullValue
 	}
 
-	return v.FromPureBinary(src)
+	return v.Read(src)
 }
 
-func (v *UUID) FromPureBinary(src []byte) ([]byte, error) {
+func (v *UUID) Read(src []byte) ([]byte, error) {
 	copy(v[:], src)
 	return src[uuidSize:], nil
 }
 
-func (v UUID) ToBinary(buf []byte) []byte {
+func (v UUID) EncodeType(buf []byte) []byte {
 	buf = pgio.AppendUint32(buf, UUIDOID)
-	buf = pgio.AppendUint32(buf, uuidSize)
-	return v.ToPureBinary(buf)
+	return v.EncodeValue(buf)
 }
 
-func (v UUID) ToPureBinary(buf []byte) []byte {
+func (v UUID) EncodeValue(buf []byte) []byte {
+	buf = pgio.AppendUint32(buf, uuidSize)
+	return v.Write(buf)
+}
+
+func (v UUID) Write(buf []byte) []byte {
 	return append(buf, v[:]...)
 }
 
@@ -113,7 +121,7 @@ const (
 
 type UUIDArray []UUID
 
-func (v *UUIDArray) FromBinary(src []byte) ([]byte, error) {
+func (v *UUIDArray) DecodeValue(src []byte) ([]byte, error) {
 	err := LenCheck(src, arrayHeaderMinSize)
 	if err != nil {
 		return nil, err
@@ -139,42 +147,40 @@ func (v *UUIDArray) FromBinary(src []byte) ([]byte, error) {
 	}
 
 	uuids := make(UUIDArray, header.Dims[0].Len)
-	var ln Int4
 	for i := range uuids {
-		src, _ = ln.FromPureBinary(src)
-		if ln == -1 {
-			return nil, ErrNullValue
+		src, err = uuids[i].DecodeValue(src)
+		if err != nil {
+			return nil, err
 		}
-		src, _ = uuids[i].FromPureBinary(src)
 	}
 
 	*v = uuids
 	return src, nil
 }
 
-func (v UUIDArray) ToBinary(buf []byte) []byte {
+func (v UUIDArray) EncodeType(buf []byte) []byte {
 	buf = pgio.AppendUint32(buf, UUIDArrayOID)
+	return v.EncodeValue(buf)
+}
+
+func (v UUIDArray) EncodeValue(buf []byte) []byte {
 	sp := len(buf)
 	buf = append(buf, 0, 0, 0, 0)
-	buf = v.ToPureBinary(buf)
+	buf = v.Write(buf)
 	pgio.SetInt32(buf[sp:], int32(len(buf)-sp-4))
 
 	return buf
 }
 
-func (v UUIDArray) ToPureBinary(buf []byte) []byte {
+func (v UUIDArray) Write(buf []byte) []byte {
 	buf = pgio.AppendUint32(buf, 1) // array dimensions
 	buf = pgio.AppendUint32(buf, 0) // contains null
 	buf = pgio.AppendUint32(buf, UUIDOID)
 	buf = pgio.AppendUint32(buf, uint32(len(v)))
 	buf = pgio.AppendUint32(buf, 0) // lower bound (always 0)
 
-	var sp int
 	for i := range v {
-		sp = len(buf)
-		buf = append(buf, 0, 0, 0, 0)
-		buf = v[i].ToPureBinary(buf)
-		pgio.SetInt32(buf[sp:], int32(len(buf)-sp-4))
+		buf = v[i].EncodeValue(buf)
 	}
 
 	return buf

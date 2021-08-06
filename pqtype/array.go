@@ -22,9 +22,9 @@ func (ah *ArrayHeader) FromBinary(src []byte) ([]byte, error) {
 	}
 
 	var ndim, hasNull Int4
-	src, _ = ndim.FromPureBinary(src)
-	src, _ = hasNull.FromPureBinary(src) // PG sends HasNull as int32
-	src, _ = ah.ElemType.FromPureBinary(src)
+	src, _ = ndim.Read(src)
+	src, _ = hasNull.Read(src) // PG sends HasNull as int32
+	src, _ = ah.ElemType.Read(src)
 
 	if ndim > 0 {
 		ah.Dims = make([]ArrayDims, ndim)
@@ -35,8 +35,8 @@ func (ah *ArrayHeader) FromBinary(src []byte) ([]byte, error) {
 		return nil, ErrInsufficientBytes
 	}
 	for i := range ah.Dims {
-		src, _ = ah.Dims[i].Len.FromPureBinary(src)
-		src, _ = ah.Dims[i].LowerBound.FromPureBinary(src)
+		src, _ = ah.Dims[i].Len.Read(src)
+		src, _ = ah.Dims[i].LowerBound.Read(src)
 	}
 
 	return src, nil

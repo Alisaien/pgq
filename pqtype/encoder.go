@@ -1,6 +1,13 @@
 package pqtype
 
-type Encoder interface {
-	ToBinary([]byte) []byte
-	ToPureBinary([]byte) []byte
+type TypeEncoder interface {
+	EncodeType([]byte) []byte
+}
+
+type ValueEncoder interface {
+	EncodeValue([]byte) []byte
+}
+
+type Writer interface {
+	Write([]byte) []byte
 }
