@@ -132,8 +132,14 @@ func (v *UUIDArray) DecodeType(src []byte) ([]byte, error) {
 		return nil, err
 	}
 
+	return v.DecodeValue(src)
+}
+
+func (v *UUIDArray) DecodeValue(src []byte) ([]byte, error) {
+	_, src = ValueSize(src)
+
 	var header ArrayHeader
-	src, err = header.FromBinary(src)
+	src, err := header.FromBinary(src)
 	if err != nil {
 		return nil, err
 	}
