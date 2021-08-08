@@ -13,12 +13,12 @@ const (
 )
 
 func (v *Int2) DecodeType(src []byte) ([]byte, error) {
-	err := LenCheck(src, int4Size)
+	err := LenCheck(src, int2Size)
 	if err != nil {
 		return nil, err
 	}
 
-	src, err = TypeCheck(src, Int4OID)
+	src, err = TypeCheck(src, Int2OID)
 	if err != nil {
 		return nil, err
 	}
