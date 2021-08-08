@@ -26,7 +26,7 @@ func (v *Text) DecodeValue(src []byte) ([]byte, error) {
 		return nil, ErrNullValue
 	}
 
-	v.Read(src)
+	v.Read(src[:size])
 	return src[size:], nil
 }
 
