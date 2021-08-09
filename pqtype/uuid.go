@@ -8,6 +8,8 @@ import (
 	"unsafe"
 )
 
+// ----- UUID -----
+
 const (
 	UUIDOID  = 2950
 	uuidSize = 16
@@ -15,7 +17,10 @@ const (
 
 type UUID [16]byte
 
-// ----- UUID -----
+func init() {
+	jsoniter.RegisterTypeDecoder("pqtype.UUID", &UUID{})
+	jsoniter.RegisterTypeEncoder("pqtype.UUID", &UUID{})
+}
 
 func (v *UUID) DecodeType(src []byte) ([]byte, error) {
 	err := LenCheck(src, uuidSize)
@@ -64,13 +69,17 @@ func (v UUID) MarshalJSON() ([]byte, error) {
 }
 
 func (v *UUID) UnmarshalJSON(src []byte) error {
-	var err error
+	if len(src) < 32 {
+		return fmt.Errorf("cannot parse UUID %v", src)
+	}
 
-	*v, err = parseUUID(string(src))
+	var err error
+	*v, err = parseUUID(string(src[1:len(src)-1]))
+
 	return err
 }
 
-func (v UUID) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+func (v *UUID) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 	var err error
 	*(*UUID)(ptr), err = parseUUID(iter.ReadString())
 
@@ -79,11 +88,11 @@ func (v UUID) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 	}
 }
 
-func (v UUID) Encode(_ unsafe.Pointer, stream *jsoniter.Stream) {
-	stream.WriteString(v.String())
+func (v *UUID) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
+	stream.WriteString((*UUID)(ptr).String())
 }
 
-func (v UUID) IsEmpty(_ unsafe.Pointer) bool {
+func (v *UUID) IsEmpty(_ unsafe.Pointer) bool {
 	return false
 }
 
