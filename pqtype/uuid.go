@@ -136,7 +136,7 @@ func (v *UUIDArray) DecodeBinary(_ *pgtype.ConnInfo, src []byte) error {
 		return ErrNullValue
 	}
 
-	_, err := v.DecodeValue(src)
+	_, err := v.Read(src)
 	return err
 }
 
@@ -155,8 +155,15 @@ func (v *UUIDArray) DecodeType(src []byte) ([]byte, error) {
 }
 
 func (v *UUIDArray) DecodeValue(src []byte) ([]byte, error) {
-	_, src = ValueSize(src)
+	size, src := ValueSize(src)
+	if size == -1 {
+		return nil, ErrNullValue
+	}
 
+	return v.Read(src)
+}
+
+func (v *UUIDArray) Read(src []byte) ([]byte, error) {
 	var header ArrayHeader
 	src, err := header.FromBinary(src)
 	if err != nil {
