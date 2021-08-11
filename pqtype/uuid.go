@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/jackc/pgio"
+	"github.com/jackc/pgtype"
 	jsoniter "github.com/json-iterator/go"
 	"unsafe"
 )
@@ -129,6 +130,15 @@ const (
 )
 
 type UUIDArray []UUID
+
+func (v *UUIDArray) DecodeBinary(_ *pgtype.ConnInfo, src []byte) error {
+	if src == nil {
+		return ErrNullValue
+	}
+
+	_, err := v.DecodeValue(src)
+	return err
+}
 
 func (v *UUIDArray) DecodeType(src []byte) ([]byte, error) {
 	err := LenCheck(src, arrayHeaderMinSize)
