@@ -5,7 +5,7 @@ import (
 	"unsafe"
 )
 
-var unsafeReaders map[uintptr]UnsafeReader
+var unsafeReaders = make(map[uintptr]UnsafeReader)
 
 type UnsafeReader interface {
 	ReadUnsafe(iter *Iterator) unsafe.Pointer
