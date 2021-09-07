@@ -12,12 +12,21 @@ func NewStream(buf []byte) *Stream {
 	return (*Stream)(pgetc.NewStream(buf))
 }
 
+func (stream *Stream) Bytes() []byte {
+	return (*pgetc.Stream)(stream).Bytes()
+}
+
 func (stream *Stream) WriteBool(b bool) {
 	pgtyp.Bool.Write(unsafe.Pointer(&b), (*pgetc.Stream)(stream))
 }
 
 func (stream *Stream) WriteBoolPtr(b *bool) {
 	pgtyp.Bool.Write(unsafe.Pointer(b), (*pgetc.Stream)(stream))
+}
+
+func (stream *Stream) WriteCompositeHeader(numField uint32, compositeOID pgetc.OID) {
+	(*pgetc.Stream)(stream).WriteUint32(numField)
+	(*pgetc.Stream)(stream).WriteUint32(uint32(compositeOID))
 }
 
 func (stream *Stream) WriteInt(i int) {
