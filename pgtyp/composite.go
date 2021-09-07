@@ -2,7 +2,6 @@ package pgtyp
 
 import (
 	"encoding/binary"
-	"github.com/Alisaien/pgq/internal"
 	"github.com/Alisaien/pgq/pgetc"
 	"unsafe"
 )

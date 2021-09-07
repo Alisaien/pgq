@@ -14,6 +14,10 @@ type Stream struct {
 	Err error
 }
 
+func NewStream(buf []byte) *Stream {
+	return &Stream{buf: buf}
+}
+
 func (stream  *Stream) Write(p []byte) {
 	stream.buf = append(stream.buf, p...)
 }
