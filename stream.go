@@ -24,9 +24,8 @@ func (stream *Stream) WriteBoolPtr(b *bool) {
 	pgtyp.Bool.Write(unsafe.Pointer(b), (*pgetc.Stream)(stream))
 }
 
-func (stream *Stream) WriteCompositeHeader(numField uint32, compositeOID pgetc.OID) {
+func (stream *Stream) WriteCompositeTypeHeader(numField uint32) {
 	(*pgetc.Stream)(stream).WriteUint32(numField)
-	(*pgetc.Stream)(stream).WriteUint32(uint32(compositeOID))
 }
 
 func (stream *Stream) WriteInt(i int) {
