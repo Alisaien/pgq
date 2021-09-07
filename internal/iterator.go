@@ -1,0 +1,48 @@
+package internal
+
+import (
+	"fmt"
+	"github.com/Alisaien/pgq/pgetc"
+)
+
+type Iterator struct {
+	Err error
+	csr int
+	nxt int
+	src []byte
+}
+
+func (iter *Iterator) Error(err error) {
+	iter.Err = fmt.Errorf("%s at %d", err.Error(), iter.csr)
+}
+
+func (iter *Iterator) Read() []byte {
+	csr := iter.csr
+	iter.csr = iter.nxt
+
+	return iter.src[csr:iter.nxt]
+}
+
+// Next prepares the next n bytes for reading
+func (iter *Iterator) Next(n int) error {
+	if iter.Err == nil {
+		iter.nxt += n
+		if iter.nxt > len(iter.src) {
+			iter.Err = pgetc.ErrEOF
+		}
+	}
+
+	return iter.Err
+}
+
+func (iter *Iterator) Next4() error {
+	return iter.Next(4)
+}
+
+func (iter *Iterator) ReadByte1() byte {
+	if iter.Next(1) != nil {
+		return 0
+	}
+
+	return iter.Read()[0]
+}

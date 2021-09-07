@@ -19,8 +19,8 @@ const (
 type UUID [16]byte
 
 func init() {
-	jsoniter.RegisterTypeDecoder("pqtype.UUID", &UUID{})
-	jsoniter.RegisterTypeEncoder("pqtype.UUID", &UUID{})
+	jsoniter.RegisterTypeDecoder("pqtype.UUID", (*UUID)(nil))
+	jsoniter.RegisterTypeEncoder("pqtype.UUID", (*UUID)(nil))
 }
 
 func (v *UUID) DecodeType(src []byte) ([]byte, error) {
@@ -83,6 +83,7 @@ func (v *UUID) UnmarshalJSON(src []byte) error {
 func (v *UUID) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 	var err error
 	*(*UUID)(ptr), err = parseUUID(iter.ReadString())
+	iter.ReadObject()
 
 	if err != nil {
 		iter.ReportError("DecodeUUID", err.Error())
