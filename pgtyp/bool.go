@@ -2,7 +2,6 @@ package pgtyp
 
 import (
 	"encoding/binary"
-	"github.com/Alisaien/pgq/internal"
 	"github.com/Alisaien/pgq/pgetc"
 	"github.com/Alisaien/pgq/pgval"
 	"unsafe"
@@ -16,7 +15,7 @@ type _boolPtr struct{}
 var Bool _bool
 var BoolPtr _boolPtr
 
-func (_bool) Read(iter *internal.Iterator) bool {
+func (_bool) Read(iter *pgetc.Iterator) bool {
 	if iter.Next4() != nil {
 		return false
 	}
@@ -29,7 +28,7 @@ func (_bool) Read(iter *internal.Iterator) bool {
 	return pgval.Bool.Read(iter)
 }
 
-func (_boolPtr) Read(iter *internal.Iterator) *bool {
+func (_boolPtr) Read(iter *pgetc.Iterator) *bool {
 	if iter.Next4() != nil {
 		return nil
 	}
@@ -42,11 +41,11 @@ func (_boolPtr) Read(iter *internal.Iterator) *bool {
 	return pgval.BoolPtr.Read(iter)
 }
 
-func (_bool) ReadUnsafe(iter *internal.Iterator) unsafe.Pointer {
+func (_bool) ReadUnsafe(iter *pgetc.Iterator) unsafe.Pointer {
 	return unsafe.Pointer(BoolPtr.Read(iter))
 }
 
-func (_bool) Write(ptr unsafe.Pointer, stream *internal.Stream) {
+func (_bool) Write(ptr unsafe.Pointer, stream *pgetc.Stream) {
 	stream.WriteUint32(BoolOID)
 	pgval.Bool.Write(ptr, stream)
 }

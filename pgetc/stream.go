@@ -1,4 +1,4 @@
-package internal
+package pgetc
 
 import (
 	"encoding/binary"

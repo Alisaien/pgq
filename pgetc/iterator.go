@@ -1,15 +1,16 @@
-package internal
+package pgetc
 
-import (
-	"fmt"
-	"github.com/Alisaien/pgq/pgetc"
-)
+import "fmt"
 
 type Iterator struct {
 	Err error
 	csr int
 	nxt int
 	src []byte
+}
+
+func NewIterator(src []byte) *Iterator {
+	return &Iterator{src: src}
 }
 
 func (iter *Iterator) Error(err error) {
@@ -28,7 +29,7 @@ func (iter *Iterator) Next(n int) error {
 	if iter.Err == nil {
 		iter.nxt += n
 		if iter.nxt > len(iter.src) {
-			iter.Err = pgetc.ErrEOF
+			iter.Err = ErrEOF
 		}
 	}
 

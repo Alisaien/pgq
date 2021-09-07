@@ -16,7 +16,7 @@ type _uuidPtr struct{}
 var UUID = _uuid{}
 var UUIDPtr = _uuidPtr{}
 
-func (_uuid) Read(iter *internal.Iterator) pgetc.UUID {
+func (_uuid) Read(iter *pgetc.Iterator) pgetc.UUID {
 	if iter.Next4() != nil {
 		return pgetc.UUID{}
 	}
@@ -29,7 +29,7 @@ func (_uuid) Read(iter *internal.Iterator) pgetc.UUID {
 	return pgval.UUID.Read(iter)
 }
 
-func (_uuidPtr) Read(iter *internal.Iterator) *pgetc.UUID {
+func (_uuidPtr) Read(iter *pgetc.Iterator) *pgetc.UUID {
 	if iter.Next4() != nil {
 		return nil
 	}
@@ -42,11 +42,11 @@ func (_uuidPtr) Read(iter *internal.Iterator) *pgetc.UUID {
 	return pgval.UUIDPtr.Read(iter)
 }
 
-func (_uuid) ReadUnsafe(iter *internal.Iterator) unsafe.Pointer {
+func (_uuid) ReadUnsafe(iter *pgetc.Iterator) unsafe.Pointer {
 	return unsafe.Pointer(UUIDPtr.Read(iter))
 }
 
-func (_uuid) Write(ptr unsafe.Pointer, stream *internal.Stream) {
+func (_uuid) Write(ptr unsafe.Pointer, stream *pgetc.Stream) {
 	stream.WriteUint32(UUIDOID)
 	pgval.UUID.Write(ptr, stream)
 }

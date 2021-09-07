@@ -24,7 +24,7 @@ var Uint32 = _uint32{}
 var IntPtr = _intPtr{}
 var Int32Ptr = _int32Ptr{}
 
-func (_int) Read(iter *internal.Iterator) int {
+func (_int) Read(iter *pgetc.Iterator) int {
 	if iter.Next4() != nil {
 		return 0
 	}
@@ -37,7 +37,7 @@ func (_int) Read(iter *internal.Iterator) int {
 	return pgval.Int.Read(iter)
 }
 
-func (_intPtr) Read(iter *internal.Iterator) *int {
+func (_intPtr) Read(iter *pgetc.Iterator) *int {
 	if iter.Next4() != nil {
 		return nil
 	}
@@ -50,7 +50,7 @@ func (_intPtr) Read(iter *internal.Iterator) *int {
 	return pgval.IntPtr.Read(iter)
 }
 
-func (_int32Ptr) Read(iter *internal.Iterator) *int32 {
+func (_int32Ptr) Read(iter *pgetc.Iterator) *int32 {
 	if iter.Next4() != nil {
 		return nil
 	}
@@ -63,15 +63,15 @@ func (_int32Ptr) Read(iter *internal.Iterator) *int32 {
 	return pgval.Int32Ptr.Read(iter)
 }
 
-func (_int) ReadUnsafe(iter *internal.Iterator) unsafe.Pointer {
+func (_int) ReadUnsafe(iter *pgetc.Iterator) unsafe.Pointer {
 	return unsafe.Pointer(IntPtr.Read(iter))
 }
 
-func (_int32) ReadUnsafe(iter *internal.Iterator) unsafe.Pointer {
+func (_int32) ReadUnsafe(iter *pgetc.Iterator) unsafe.Pointer {
 	return unsafe.Pointer(Int32Ptr.Read(iter))
 }
 
-func (_int) Write(ptr unsafe.Pointer, stream *internal.Stream) {
+func (_int) Write(ptr unsafe.Pointer, stream *pgetc.Stream) {
 	stream.WriteUint32(Int4OID)
 	pgval.Int.Write(ptr, stream)
 }

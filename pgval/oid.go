@@ -2,7 +2,6 @@ package pgval
 
 import (
 	"encoding/binary"
-	"github.com/Alisaien/pgq/internal"
 	"github.com/Alisaien/pgq/pgbin"
 	"github.com/Alisaien/pgq/pgetc"
 	"unsafe"
@@ -16,7 +15,7 @@ var (
 	OID _oid
 )
 
-func (_oid) Read(iter *internal.Iterator) pgetc.OID {
+func (_oid) Read(iter *pgetc.Iterator) pgetc.OID {
 	if iter.Next4() != nil {
 		return 0
 	}
@@ -34,7 +33,7 @@ func (_oid) Read(iter *internal.Iterator) pgetc.OID {
 	return pgbin.OID.Read(iter)
 }
 
-func (_oid) Write(ptr unsafe.Pointer, stream *internal.Stream) {
+func (_oid) Write(ptr unsafe.Pointer, stream *pgetc.Stream) {
 	stream.WriteUint32(4)
 	pgbin.OID.Write(ptr, stream)
 }

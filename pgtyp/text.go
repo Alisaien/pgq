@@ -16,7 +16,7 @@ type _stringPtr struct{}
 var String = _string{}
 var StringPtr = _stringPtr{}
 
-func (_string) Read(iter *internal.Iterator) string {
+func (_string) Read(iter *pgetc.Iterator) string {
 	if iter.Next4() != nil {
 		return ""
 	}
@@ -29,7 +29,7 @@ func (_string) Read(iter *internal.Iterator) string {
 	return pgval.String.Read(iter)
 }
 
-func (_stringPtr) Read(iter *internal.Iterator) *string {
+func (_stringPtr) Read(iter *pgetc.Iterator) *string {
 	if iter.Next4() != nil {
 		return nil
 	}
@@ -42,11 +42,11 @@ func (_stringPtr) Read(iter *internal.Iterator) *string {
 	return pgval.StringPtr.Read(iter)
 }
 
-func (_string) ReadUnsafe(iter *internal.Iterator) unsafe.Pointer {
+func (_string) ReadUnsafe(iter *pgetc.Iterator) unsafe.Pointer {
 	return unsafe.Pointer(StringPtr.Read(iter))
 }
 
-func (_string) Write(ptr unsafe.Pointer, stream *internal.Stream) {
+func (_string) Write(ptr unsafe.Pointer, stream *pgetc.Stream) {
 	stream.WriteUint32(TextOID)
 	pgval.String.Write(ptr, stream)
 }

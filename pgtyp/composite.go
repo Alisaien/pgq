@@ -13,7 +13,7 @@ type _composite struct{}
 
 var Composite _composite
 
-func (_composite) Read(iter *internal.Iterator) unsafe.Pointer {
+func (_composite) Read(iter *pgetc.Iterator) unsafe.Pointer {
 	if iter.Next4() != nil {
 		return nil
 	}

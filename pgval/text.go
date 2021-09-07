@@ -2,7 +2,6 @@ package pgval
 
 import (
 	"encoding/binary"
-	"github.com/Alisaien/pgq/internal"
 	"github.com/Alisaien/pgq/pgbin"
 	"github.com/Alisaien/pgq/pgetc"
 	"unsafe"
@@ -14,7 +13,7 @@ type _stringPtr struct{}
 var String = _string{}
 var StringPtr =_stringPtr{}
 
-func (_string) Read(iter *internal.Iterator) string {
+func (_string) Read(iter *pgetc.Iterator) string {
 	if iter.Next4() != nil {
 		return ""
 	}
@@ -32,7 +31,7 @@ func (_string) Read(iter *internal.Iterator) string {
 	return pgbin.String.Read(iter)
 }
 
-func (_stringPtr) Read(iter *internal.Iterator) *string {
+func (_stringPtr) Read(iter *pgetc.Iterator) *string {
 	if iter.Next4() != nil {
 		return nil
 	}
@@ -50,7 +49,7 @@ func (_stringPtr) Read(iter *internal.Iterator) *string {
 	return &val
 }
 
-func (_string) Write(ptr unsafe.Pointer, stream *internal.Stream) {
+func (_string) Write(ptr unsafe.Pointer, stream *pgetc.Stream) {
 	stream.WriteUint32(uint32(len(*(*string)(ptr))))
 	pgbin.String.Write(ptr, stream)
 }

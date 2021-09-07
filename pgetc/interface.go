@@ -1,7 +1,6 @@
 package pgetc
 
 import (
-	"github.com/Alisaien/pgq/internal"
 	"github.com/modern-go/reflect2"
 	"unsafe"
 )
@@ -9,7 +8,7 @@ import (
 var unsafeReaders map[uintptr]UnsafeReader
 
 type UnsafeReader interface {
-	ReadUnsafe(iter *internal.Iterator) unsafe.Pointer
+	ReadUnsafe(iter *Iterator) unsafe.Pointer
 }
 
 func RegisterUnsafeReader(obj interface{}, reader UnsafeReader) {
