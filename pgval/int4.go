@@ -75,6 +75,24 @@ func (_int32Ptr) Read(iter *pgetc.Iterator) *int32 {
 	return &val
 }
 
+func (_uint32) Read(iter *pgetc.Iterator) uint32 {
+	if iter.Next4() != nil {
+		return 0
+	}
+
+	size := int32(binary.BigEndian.Uint32(iter.Read()))
+	if size == -1 {
+		iter.Error(pgetc.ErrNull)
+		return 0
+	}
+
+	if iter.Next(int(size)) != nil {
+		return 0
+	}
+
+	return pgbin.Uint32.Read(iter)
+}
+
 func (_int) Write(ptr unsafe.Pointer, stream *pgetc.Stream) {
 	stream.WriteUint32(4)
 	pgbin.Int.Write(ptr, stream)

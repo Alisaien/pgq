@@ -1,9 +1,10 @@
 package pgq
 
 import (
+	"github.com/Alisaien/pgq/pgbin"
 	"github.com/Alisaien/pgq/pgetc"
 	"github.com/Alisaien/pgq/pgtyp"
-	"unsafe"
+	"time"
 )
 
 type Iterator pgetc.Iterator
@@ -20,8 +21,8 @@ func (iter *Iterator) ReadBoolPtr() *bool {
 	return pgtyp.BoolPtr.Read((*pgetc.Iterator)(iter))
 }
 
-func (iter *Iterator) ReadComposite() unsafe.Pointer {
-	return pgtyp.Composite.Read((*pgetc.Iterator)(iter))
+func (iter *Iterator) ReadCompositeTypeHeader() uint32 {
+	return pgbin.Uint32.Read((*pgetc.Iterator)(iter))
 }
 
 func (iter *Iterator) ReadInt() int {
@@ -46,6 +47,10 @@ func (iter *Iterator) ReadString() string {
 
 func (iter *Iterator) ReadStringPtr() *string {
 	return pgtyp.StringPtr.Read((*pgetc.Iterator)(iter))
+}
+
+func (iter *Iterator) ReadTimestamptz() time.Time {
+	return pgtyp.Timestamptz.Read((*pgetc.Iterator)(iter))
 }
 
 func (iter *Iterator) ReadUUID() pgetc.UUID {
