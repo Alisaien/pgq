@@ -22,6 +22,9 @@ func (iter *Iterator) ReadBoolPtr() *bool {
 }
 
 func (iter *Iterator) ReadCompositeTypeHeader() uint32 {
+	if err := (*pgetc.Iterator)(iter).Next4(); err != nil {
+		return 0
+	}
 	return pgbin.Uint32.Read((*pgetc.Iterator)(iter))
 }
 
