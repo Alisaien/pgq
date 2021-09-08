@@ -20,7 +20,7 @@ func (_timestamptz) Read(iter *pgetc.Iterator) time.Time {
 	microsecSinceY2K := int64(binary.BigEndian.Uint64(iter.Read()))
 	switch microsecSinceY2K {
 	case inftyMicroSecOffset, negInftyMicroSecOffset:
-		iter.Err = pgetc.ErrInfinity
+		iter.Error(pgetc.ErrInfinity)
 		return time.Time{}
 	default:
 		microSecSinceUnixEpoch := microSecFromUnixEpochToY2K + microsecSinceY2K

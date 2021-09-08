@@ -29,7 +29,7 @@ func (iter *Iterator) Next(n int) error {
 	if iter.Err == nil {
 		iter.nxt += n
 		if iter.nxt > len(iter.src) {
-			iter.Err = ErrEOF
+			iter.Error(ErrEOF)
 		}
 	}
 
@@ -38,12 +38,4 @@ func (iter *Iterator) Next(n int) error {
 
 func (iter *Iterator) Next4() error {
 	return iter.Next(4)
-}
-
-func (iter *Iterator) ReadByte1() byte {
-	if iter.Next(1) != nil {
-		return 0
-	}
-
-	return iter.Read()[0]
 }

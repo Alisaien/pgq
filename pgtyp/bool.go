@@ -21,7 +21,7 @@ func (_bool) Read(iter *pgetc.Iterator) bool {
 	}
 
 	if binary.BigEndian.Uint32(iter.Read()) != BoolOID {
-		iter.Error(pgetc.ErrInvalidSrcLength)
+		iter.Error(pgetc.ErrUnexpectedType)
 		return false
 	}
 
@@ -34,7 +34,7 @@ func (_boolPtr) Read(iter *pgetc.Iterator) *bool {
 	}
 
 	if binary.BigEndian.Uint32(iter.Read()) != BoolOID {
-		iter.Error(pgetc.ErrInvalidSrcLength)
+		iter.Error(pgetc.ErrUnexpectedType)
 		return nil
 	}
 

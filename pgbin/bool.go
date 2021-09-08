@@ -13,7 +13,7 @@ func (_bool) Read(iter *pgetc.Iterator) bool {
 	if iter.Err != nil {
 		return false
 	}
-	return iter.ReadByte1() == 1
+	return iter.Read()[0] == 1
 }
 
 func (_bool) Write(ptr unsafe.Pointer, stream *pgetc.Stream) {
