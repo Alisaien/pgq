@@ -1,5 +1,6 @@
 package pqtype
 
+/*
 const (
 	arrayHeaderMinSize = 12
 	arrayDimsSize      = 8
@@ -41,3 +42,4 @@ func (ah *ArrayHeader) FromBinary(src []byte) ([]byte, error) {
 
 	return src, nil
 }
+*/

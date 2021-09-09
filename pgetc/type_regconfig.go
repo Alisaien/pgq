@@ -1,13 +1,8 @@
-package pqtype
-
-import "encoding/binary"
+package pgetc
 
 //go:generate stringer -type=Regconfig
 
-const (
-	RegconfigOID  = 3734
-	regconfigSize = 4
-)
+const RegconfigOID  = 3734
 
 type Regconfig int32
 
@@ -35,31 +30,3 @@ const (
 	Tamil      Regconfig = 13108
 	Turkish    Regconfig = 13110
 )
-
-func (v *Regconfig) DecodeType(src []byte) ([]byte, error) {
-	err := LenCheck(src, regconfigSize)
-	if err != nil {
-		return nil, err
-	}
-
-	src, err = TypeCheck(src, RegconfigOID)
-	if err != nil {
-		return nil, err
-	}
-
-	return v.DecodeValue(src)
-}
-
-func (v *Regconfig) DecodeValue(src []byte) ([]byte, error) {
-	size, src := ValueSize(src)
-	if size == -1 {
-		return nil, ErrNullValue
-	}
-
-	return v.Read(src)
-}
-
-func (v *Regconfig) Read(src []byte) ([]byte, error) {
-	*v = Regconfig(binary.BigEndian.Uint32(src))
-	return src[regconfigSize:], nil
-}
