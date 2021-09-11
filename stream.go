@@ -16,16 +16,20 @@ func NewStream(buf []byte) *Stream {
 	return (*Stream)(pgetc.NewStream(buf))
 }
 
+func (stream *Stream) Stream() *pgetc.Stream {
+	return (*pgetc.Stream)(stream)
+}
+
+func (stream *Stream) Err() error {
+	return stream.Stream().Err()
+}
+
 func (stream *Stream) Len() int {
 	return stream.Stream().Len()
 }
 
 func (stream *Stream) Bytes() []byte {
 	return stream.Stream().Bytes()
-}
-
-func (stream *Stream) Stream() *pgetc.Stream {
-	return (*pgetc.Stream)(stream)
 }
 
 func (stream *Stream) WriteBool(b bool) {
