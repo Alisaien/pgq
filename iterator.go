@@ -13,6 +13,14 @@ func NewIterator(src []byte) *Iterator {
 	return (*Iterator)(pgetc.NewIterator(src))
 }
 
+func (iter *Iterator) Iterator() *pgetc.Iterator {
+	return (*pgetc.Iterator)(iter)
+}
+
+func (iter *Iterator) Err() error {
+	return iter.Iterator().Err()
+}
+
 func (iter *Iterator) ReadBool() bool {
 	return pgtyp.Bool.Read((*pgetc.Iterator)(iter))
 }

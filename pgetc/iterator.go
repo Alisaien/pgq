@@ -30,14 +30,14 @@ func (iter *Iterator) Read() []byte {
 
 // Next prepares the next n bytes for reading
 func (iter *Iterator) Next(n int) error {
-	if iter.err == nil {
+	if iter.Err() == nil {
 		iter.nxt += n
 		if iter.nxt > len(iter.src) {
 			iter.ReportError(ErrEOF)
 		}
 	}
 
-	return iter.err
+	return iter.Err()
 }
 
 func (iter *Iterator) Next4() error {

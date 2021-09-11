@@ -2,15 +2,24 @@ package pgetc
 
 import (
 	"encoding/binary"
+	"fmt"
 )
 
 type Stream struct {
 	buf []byte
-	Err error
+	err error
 }
 
 func NewStream(buf []byte) *Stream {
 	return &Stream{buf: buf}
+}
+
+func (stream *Stream) Err() error {
+	return stream.err
+}
+
+func (stream *Stream) ReportError(err error) {
+	stream.err = fmt.Errorf("%s at %d", err.Error(), len(stream.buf))
 }
 
 func (stream  *Stream) Write(p []byte) {

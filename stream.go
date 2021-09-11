@@ -6,16 +6,11 @@ import (
 	"unsafe"
 )
 
-type Foo struct{
-	Bar int
-}
-
-func (*Foo) Write(ptr unsafe.Pointer, stream *Stream) {
-	stream.WriteCompositeTypeHeader(1)
-	stream.WriteInt((*Foo)(ptr).Bar)
-}
-
 type Stream pgetc.Stream
+
+type Streamable interface {
+	WriteTo(stream *Stream)
+}
 
 func NewStream(buf []byte) *Stream {
 	return (*Stream)(pgetc.NewStream(buf))
@@ -37,8 +32,12 @@ func (stream *Stream) WriteBool(b bool) {
 	pgetc.Bool(b).WriteType(stream.Stream())
 }
 
-func (stream *Stream) WriteCompositeTypeHeader(numField uint32) {
-	(*pgetc.Stream)(stream).WriteUint32(numField)
+func (stream *Stream) WriteCompositeType(oid pgetc.OID, v Streamable) {
+	stream.Stream().WriteUint32(uint32(oid))
+	sp := stream.Len()
+	stream.Stream().WriteUint32(0)
+	v.WriteTo(stream)
+	stream.Stream().SetUint32(sp, uint32(stream.Len() - sp))
 }
 
 func (stream *Stream) WriteInt(i int) {
