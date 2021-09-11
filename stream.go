@@ -39,9 +39,11 @@ func (stream *Stream) WriteBool(b bool) {
 func (stream *Stream) WriteCompositeType(oid pgetc.OID, v Streamable) {
 	stream.Stream().WriteUint32(uint32(oid))
 	sp := stream.Len()
-	stream.Stream().WriteUint32(-1)
-	v.WriteTo(stream)
-	stream.Stream().SetUint32(sp, uint32(stream.Len() - sp - 4)) // -4 to account for numField (4 bytes)
+	stream.Stream().WriteInt32(-1)
+	if v != nil {
+		v.WriteTo(stream)
+		stream.Stream().SetUint32(sp, uint32(stream.Len() - sp - 4)) // -4 to account for numField (4 bytes)
+	}
 }
 
 func (stream *Stream) WriteInt(i int) {

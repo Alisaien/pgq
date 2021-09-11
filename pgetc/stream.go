@@ -30,6 +30,10 @@ func (stream *Stream) WriteByte1(b byte) {
 	stream.buf = append(stream.buf, b)
 }
 
+func (stream *Stream) WriteInt32(v int32) {
+	stream.WriteUint32(uint32(v))
+}
+
 func (stream *Stream) WriteUint16(v uint16) {
 	wp := len(stream.buf)
 	stream.buf = append(stream.buf, 0, 0)
