@@ -28,7 +28,7 @@ func (_int) Read(iter *pgetc.Iterator) int {
 
 	size := int32(binary.BigEndian.Uint32(iter.Read()))
 	if size == -1 {
-		iter.Error(pgetc.ErrNull)
+		iter.ReportError(pgetc.ErrNull)
 		return 0
 	}
 
@@ -82,7 +82,7 @@ func (_uint32) Read(iter *pgetc.Iterator) uint32 {
 
 	size := int32(binary.BigEndian.Uint32(iter.Read()))
 	if size == -1 {
-		iter.Error(pgetc.ErrNull)
+		iter.ReportError(pgetc.ErrNull)
 		return 0
 	}
 

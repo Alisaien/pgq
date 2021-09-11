@@ -4,10 +4,9 @@ import (
 	"encoding/binary"
 	"github.com/Alisaien/pgq/pgetc"
 	"github.com/Alisaien/pgq/pgval"
-	"unsafe"
 )
 
-const OIDOID  = 26
+
 
 type (
 	_oid struct{}
@@ -22,15 +21,10 @@ func (_oid) Read(iter *pgetc.Iterator) pgetc.OID {
 		return 0
 	}
 
-	if binary.BigEndian.Uint32(iter.Read()) != OIDOID {
-		iter.Error(pgetc.ErrUnexpectedType)
+	if binary.BigEndian.Uint32(iter.Read()) != pgetc.OIDOID {
+		iter.ReportError(pgetc.ErrUnexpectedType)
 		return 0
 	}
 
 	return pgval.OID.Read(iter)
-}
-
-func (_oid) Write(ptr unsafe.Pointer, stream *pgetc.Stream) {
-	stream.WriteUint32(OIDOID)
-	pgval.OID.Write(ptr, stream)
 }

@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"github.com/Alisaien/pgq/pgbin"
 	"github.com/Alisaien/pgq/pgetc"
-	"unsafe"
 )
 
 type _bool struct{}
@@ -20,7 +19,7 @@ func (_bool) Read(iter *pgetc.Iterator) bool {
 
 	size := int32(binary.BigEndian.Uint32(iter.Read()))
 	if size == -1 {
-		iter.Error(pgetc.ErrNull)
+		iter.ReportError(pgetc.ErrNull)
 		return false
 	}
 
@@ -47,9 +46,4 @@ func (_boolPtr) Read(iter *pgetc.Iterator) *bool {
 
 	val := pgbin.Bool.Read(iter)
 	return &val
-}
-
-func (_bool) Write(ptr unsafe.Pointer, stream *pgetc.Stream) {
-	stream.WriteUint32(1)
-	pgbin.Bool.Write(ptr, stream)
 }

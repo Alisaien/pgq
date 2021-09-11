@@ -21,7 +21,7 @@ func (_string) Read(iter *pgetc.Iterator) string {
 	}
 
 	if binary.BigEndian.Uint32(iter.Read()) != TextOID {
-		iter.Error(pgetc.ErrUnexpectedType)
+		iter.ReportError(pgetc.ErrUnexpectedType)
 		return ""
 	}
 
@@ -34,7 +34,7 @@ func (_stringPtr) Read(iter *pgetc.Iterator) *string {
 	}
 
 	if binary.BigEndian.Uint32(iter.Read()) != TextOID {
-		iter.Error(pgetc.ErrInvalidSrcLength)
+		iter.ReportError(pgetc.ErrInvalidSrcLength)
 		return nil
 	}
 

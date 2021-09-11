@@ -2,12 +2,7 @@ package pgetc
 
 import (
 	"encoding/binary"
-	"unsafe"
 )
-
-type Streamable interface {
-	Write(ptr unsafe.Pointer, stream *Stream)
-}
 
 type Stream struct {
 	buf []byte
@@ -36,6 +31,14 @@ func (stream *Stream) WriteUint32(v uint32) {
 	wp := len(stream.buf)
 	stream.buf = append(stream.buf, 0, 0, 0, 0)
 	binary.BigEndian.PutUint32(stream.buf[wp:], v)
+}
+
+func (stream *Stream) SetUint32(sp int, v uint32) {
+	binary.BigEndian.PutUint32(stream.buf[sp:], v)
+}
+
+func (stream *Stream) Len() int {
+	return len(stream.buf)
 }
 
 func (stream *Stream) Bytes() []byte {

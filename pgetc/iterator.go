@@ -3,7 +3,7 @@ package pgetc
 import "fmt"
 
 type Iterator struct {
-	Err error
+	err error
 	csr int
 	nxt int
 	src []byte
@@ -13,8 +13,12 @@ func NewIterator(src []byte) *Iterator {
 	return &Iterator{src: src}
 }
 
-func (iter *Iterator) Error(err error) {
-	iter.Err = fmt.Errorf("%s at %d", err.Error(), iter.csr)
+func (iter *Iterator) Err() error {
+	return iter.err
+}
+
+func (iter *Iterator) ReportError(err error) {
+	iter.err = fmt.Errorf("%s at %d", err.Error(), iter.csr)
 }
 
 func (iter *Iterator) Read() []byte {
@@ -26,14 +30,14 @@ func (iter *Iterator) Read() []byte {
 
 // Next prepares the next n bytes for reading
 func (iter *Iterator) Next(n int) error {
-	if iter.Err == nil {
+	if iter.err == nil {
 		iter.nxt += n
 		if iter.nxt > len(iter.src) {
-			iter.Error(ErrEOF)
+			iter.ReportError(ErrEOF)
 		}
 	}
 
-	return iter.Err
+	return iter.err
 }
 
 func (iter *Iterator) Next4() error {

@@ -21,7 +21,7 @@ func (_int16) Read(iter *pgetc.Iterator) int16 {
 	}
 
 	if binary.BigEndian.Uint32(iter.Read()) != Int2OID {
-		iter.Error(pgetc.ErrInvalidSrcLength)
+		iter.ReportError(pgetc.ErrInvalidSrcLength)
 		return 0
 	}
 
@@ -34,7 +34,7 @@ func (_int16Ptr) Read(iter *pgetc.Iterator) *int16 {
 	}
 
 	if binary.BigEndian.Uint32(iter.Read()) != Int2OID {
-		iter.Error(pgetc.ErrInvalidSrcLength)
+		iter.ReportError(pgetc.ErrInvalidSrcLength)
 		return nil
 	}
 

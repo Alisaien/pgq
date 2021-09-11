@@ -7,24 +7,41 @@ import (
 	"unsafe"
 )
 
+const UUIDOID = 2950
 type UUID [16]byte
 
-func (v UUID) MarshalJSON() ([]byte, error) {
-	return []byte(`"` + v.String() + `"`), nil
+func (u UUID) WriteType(stream *Stream) {
+	stream.WriteUint32(UUIDOID)
+	u.WriteValue(stream)
 }
 
-func (v *UUID) UnmarshalJSON(src []byte) error {
+func (u UUID) WriteValue(stream *Stream) {
+	stream.WriteUint32(16)
+	u.WriteBinary(stream)
+}
+
+func (u UUID) WriteBinary(stream *Stream) {
+	stream.Write(u[:])
+}
+
+// --------------------------------
+
+func (u UUID) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + u.String() + `"`), nil
+}
+
+func (u *UUID) UnmarshalJSON(src []byte) error {
 	if len(src) < 32 {
 		return fmt.Errorf("cannot parse UUID %v", src)
 	}
 
 	var err error
-	*v, err = parseUUID(string(src[1 : len(src)-1]))
+	*u, err = parseUUID(string(src[1 : len(src)-1]))
 
 	return err
 }
 
-func (v *UUID) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+func (u *UUID) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 	var err error
 	*(*UUID)(ptr), err = parseUUID(iter.ReadString())
 	iter.ReadObject()
@@ -34,16 +51,16 @@ func (v *UUID) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 	}
 }
 
-func (v *UUID) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
+func (u *UUID) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
 	stream.WriteString((*UUID)(ptr).String())
 }
 
-func (v *UUID) IsEmpty(_ unsafe.Pointer) bool {
+func (u *UUID) IsEmpty(_ unsafe.Pointer) bool {
 	return false
 }
 
-func (v UUID) String() string {
-	return fmt.Sprintf("%x-%x-%x-%x-%x", v[0:4], v[4:6], v[6:8], v[8:10], v[10:16])
+func (u UUID) String() string {
+	return fmt.Sprintf("%x-%x-%x-%x-%x", u[0:4], u[4:6], u[6:8], u[8:10], u[10:16])
 }
 
 func parseUUID(src string) ([16]byte, error) {

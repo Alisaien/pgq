@@ -19,7 +19,7 @@ func (_timestamptz) Read(iter *pgetc.Iterator) time.Time {
 	}
 
 	if binary.BigEndian.Uint32(iter.Read()) != TimestamptzOID {
-		iter.Error(pgetc.ErrInvalidSrcLength)
+		iter.ReportError(pgetc.ErrInvalidSrcLength)
 		return time.Time{}
 	}
 

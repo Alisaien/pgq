@@ -29,7 +29,7 @@ func (_int) Read(iter *pgetc.Iterator) int {
 	}
 
 	if binary.BigEndian.Uint32(iter.Read()) != Int4OID {
-		iter.Error(pgetc.ErrInvalidSrcLength)
+		iter.ReportError(pgetc.ErrInvalidSrcLength)
 		return 0
 	}
 
@@ -42,7 +42,7 @@ func (_intPtr) Read(iter *pgetc.Iterator) *int {
 	}
 
 	if binary.BigEndian.Uint32(iter.Read()) != Int4OID {
-		iter.Error(pgetc.ErrInvalidSrcLength)
+		iter.ReportError(pgetc.ErrInvalidSrcLength)
 		return nil
 	}
 
@@ -55,7 +55,7 @@ func (_int32Ptr) Read(iter *pgetc.Iterator) *int32 {
 	}
 
 	if binary.BigEndian.Uint32(iter.Read()) != Int4OID {
-		iter.Error(pgetc.ErrInvalidSrcLength)
+		iter.ReportError(pgetc.ErrInvalidSrcLength)
 		return nil
 	}
 
@@ -68,7 +68,7 @@ func (_uint32) Read(iter *pgetc.Iterator) uint32 {
 	}
 
 	if binary.BigEndian.Uint32(iter.Read()) != Int4OID {
-		iter.Error(pgetc.ErrInvalidSrcLength)
+		iter.ReportError(pgetc.ErrInvalidSrcLength)
 		return 0
 	}
 

@@ -18,7 +18,7 @@ func (_timestamptz) Read(iter *pgetc.Iterator) time.Time {
 
 	size := int32(binary.BigEndian.Uint32(iter.Read()))
 	if size == -1 {
-		iter.Error(pgetc.ErrNull)
+		iter.ReportError(pgetc.ErrNull)
 		return time.Time{}
 	}
 

@@ -12,7 +12,7 @@ type _string struct{}
 var String = _string{}
 
 func (_string) Read(iter *pgetc.Iterator) string {
-	if iter.Err != nil {
+	if iter.Err() != nil {
 		return ""
 	}
 	return string(iter.Read())
