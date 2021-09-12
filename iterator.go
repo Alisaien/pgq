@@ -4,6 +4,7 @@ import (
 	"github.com/Alisaien/pgq/pgbin"
 	"github.com/Alisaien/pgq/pgetc"
 	"github.com/Alisaien/pgq/pgtyp"
+	"github.com/Alisaien/pgq/pgval"
 	"time"
 )
 
@@ -21,6 +22,10 @@ func (iter *Iterator) Err() error {
 	return iter.Iterator().Err()
 }
 
+func (iter *Iterator) ReportError(err error) {
+	iter.Iterator().ReportError(err)
+}
+
 func (iter *Iterator) ReadBool() bool {
 	return pgtyp.Bool.Read((*pgetc.Iterator)(iter))
 }
@@ -34,6 +39,17 @@ func (iter *Iterator) ReadCompositeTypeHeader() uint32 {
 		return 0
 	}
 	return pgbin.Uint32.Read((*pgetc.Iterator)(iter))
+}
+
+func (iter *Iterator) ReadEnum(oid pgetc.OID) string {
+	id := iter.Iterator().ReadUint32()
+	if id == 0 {
+		return ""
+	} else if id != uint32(oid) {
+		iter.ReportError(pgetc.ErrUnexpectedType)
+	}
+
+	return pgval.String.Read(iter.Iterator())
 }
 
 func (iter *Iterator) ReadInt() int {

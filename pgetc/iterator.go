@@ -1,6 +1,9 @@
 package pgetc
 
-import "fmt"
+import (
+	"encoding/binary"
+	"fmt"
+)
 
 type Iterator struct {
 	err error
@@ -26,6 +29,11 @@ func (iter *Iterator) Read() []byte {
 	iter.csr = iter.nxt
 
 	return iter.src[csr:iter.nxt]
+}
+
+func (iter *Iterator) ReadUint32() uint32 {
+	_ = iter.Next4()
+	return binary.BigEndian.Uint32(iter.Read())
 }
 
 // Next prepares the next n bytes for reading
