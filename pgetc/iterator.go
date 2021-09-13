@@ -31,6 +31,13 @@ func (iter *Iterator) Read() []byte {
 	return iter.src[csr:iter.nxt]
 }
 
+func (iter *Iterator) ReadByte() (byte, error) {
+	if err := iter.Next(1); err != nil {
+		return 0, err
+	}
+	return iter.Read()[0], nil
+}
+
 func (iter *Iterator) ReadUint32() uint32 {
 	_ = iter.Next4()
 	return binary.BigEndian.Uint32(iter.Read())

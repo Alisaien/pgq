@@ -81,8 +81,16 @@ func (iter *Iterator) ReadJSONB(v interface{}) {
 		err error
 		data []byte
 	)
-	if size != -1 {
-		if err = iter.Iterator().Next(int(size)); err != nil {
+	if size == -1 {
+		data = []byte("null")
+	} else {
+		if b, err := iter.Iterator().ReadByte(); err != nil {
+			return
+		} else if b != 1 {
+			iter.ReportError(pgetc.ErrUnknownVersion)
+		}
+
+		if err = iter.Iterator().Next(int(size)-1); err != nil { // 1 byte already read
 			return
 		}
 		data = iter.Iterator().Read()

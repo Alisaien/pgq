@@ -14,6 +14,6 @@ var ErrNumFieldMismatch = errors.New("unexpected number of fields for composite 
 
 var ErrTooManyDims = errors.New("too many dims in array")
 
-var ErrUnknownType = errors.New("unknown type")
-
 var ErrUnexpectedType = errors.New("unexpected type")
+
+var ErrUnknownVersion = errors.New("unknown version")
