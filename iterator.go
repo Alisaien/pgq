@@ -5,6 +5,8 @@ import (
 	"github.com/Alisaien/pgq/pgetc"
 	"github.com/Alisaien/pgq/pgtyp"
 	"github.com/Alisaien/pgq/pgval"
+	"github.com/jackc/pgtype"
+	jsoniter "github.com/json-iterator/go"
 	"time"
 )
 
@@ -66,6 +68,29 @@ func (iter *Iterator) ReadInt16() int16 {
 
 func (iter *Iterator) ReadInt16Ptr() *int16 {
 	return pgtyp.Int16Ptr.Read((*pgetc.Iterator)(iter))
+}
+
+func (iter *Iterator) ReadJSONB(v interface{}) {
+	oid := iter.Iterator().ReadUint32()
+	if oid != pgtype.JSONBOID {
+		return
+	}
+	size := int32(iter.Iterator().ReadUint32())
+
+	var (
+		err error
+		data []byte
+	)
+	if size != -1 {
+		if err = iter.Iterator().Next(int(size)); err != nil {
+			return
+		}
+		data = iter.Iterator().Read()
+	}
+
+	if err = jsoniter.Unmarshal(data, v); err != nil {
+		iter.ReportError(err)
+	}
 }
 
 func (iter *Iterator) ReadString() string {
