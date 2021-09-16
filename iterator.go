@@ -109,7 +109,7 @@ func (iter *Iterator) ReadStringPtr() *string {
 	return pgtyp.StringPtr.Read((*pgetc.Iterator)(iter))
 }
 
-func (iter *Iterator) ReadTimestamptz() time.Time {
+func (iter *Iterator) ReadTime() time.Time {
 	return pgtyp.Timestamptz.Read((*pgetc.Iterator)(iter))
 }
 

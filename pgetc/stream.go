@@ -22,8 +22,9 @@ func (stream *Stream) ReportError(err error) {
 	stream.err = fmt.Errorf("%s at %d", err.Error(), len(stream.buf))
 }
 
-func (stream  *Stream) Write(p []byte) {
+func (stream *Stream) Write(p []byte) (int, error) {
 	stream.buf = append(stream.buf, p...)
+	return len(p), nil
 }
 
 func (stream *Stream) WriteByte1(b byte) {
@@ -44,6 +45,12 @@ func (stream *Stream) WriteUint32(v uint32) {
 	wp := len(stream.buf)
 	stream.buf = append(stream.buf, 0, 0, 0, 0)
 	binary.BigEndian.PutUint32(stream.buf[wp:], v)
+}
+
+func (stream *Stream) WriteUint64(v uint64) {
+	wp := len(stream.buf)
+	stream.buf = append(stream.buf, 0, 0, 0, 0, 0, 0, 0, 0)
+	binary.BigEndian.PutUint64(stream.buf[wp:], v)
 }
 
 func (stream *Stream) SetUint32(sp int, v uint32) {
