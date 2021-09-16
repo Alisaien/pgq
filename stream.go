@@ -72,6 +72,7 @@ func (stream *Stream) WriteJSONB(v interface{}) {
 	sp := stream.Len()
 	stream.Stream().WriteInt32(-1)
 
+	stream.Stream().WriteByte(1)
 	if err := jsoniter.NewEncoder(stream.Stream()).Encode(v); err != nil {
 		stream.ReportError(err)
 		return

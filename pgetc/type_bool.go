@@ -15,8 +15,8 @@ func (b Bool) WriteValue(stream *Stream) {
 
 func (b Bool) WriteBinary(stream *Stream) {
 	if b {
-		stream.WriteByte1(1)
+		stream.WriteByte(1)
 	} else {
-		stream.WriteByte1(0)
+		stream.WriteByte(0)
 	}
 }

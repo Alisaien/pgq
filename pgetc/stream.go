@@ -27,8 +27,9 @@ func (stream *Stream) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
-func (stream *Stream) WriteByte1(b byte) {
+func (stream *Stream) WriteByte(b byte) error {
 	stream.buf = append(stream.buf, b)
+	return nil
 }
 
 func (stream *Stream) WriteInt32(v int32) {
