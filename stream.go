@@ -49,7 +49,7 @@ func (stream *Stream) WriteCompositeType(oid pgetc.OID, v Streamable) {
 	stream.Stream().WriteInt32(-1)
 	if v != nil {
 		v.WriteTo(stream)
-		stream.Stream().SetUint32(sp, uint32(stream.Len() - sp - 4)) // -4 to account for numField (4 bytes)
+		stream.Stream().SetUint32(sp, uint32(stream.Len()-sp-4)) // -4 to account for numField (4 bytes)
 	}
 }
 
@@ -67,6 +67,12 @@ func (stream *Stream) WriteInt16(i int16) {
 	pgtyp.Int16.Write(unsafe.Pointer(&i), (*pgetc.Stream)(stream))
 }
 
+func (stream *Stream) WriteInt64(n int64) {
+	stream.Stream().WriteUint32(pgtype.Int8OID)
+	stream.Stream().WriteUint32(8)
+	stream.Stream().WriteUint64(uint64(n))
+}
+
 func (stream *Stream) WriteJSONB(v interface{}) {
 	stream.Stream().WriteUint32(pgtype.JSONBOID)
 	sp := stream.Len()
@@ -78,7 +84,7 @@ func (stream *Stream) WriteJSONB(v interface{}) {
 		return
 	}
 
-	stream.Stream().SetUint32(sp, uint32(stream.Len() - sp - 4))
+	stream.Stream().SetUint32(sp, uint32(stream.Len()-sp-4))
 }
 
 func (stream *Stream) WriteString(s string) {

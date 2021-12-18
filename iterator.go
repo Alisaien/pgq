@@ -5,6 +5,7 @@ import (
 	"github.com/Alisaien/pgq/pgetc"
 	"github.com/Alisaien/pgq/pgtyp"
 	"github.com/Alisaien/pgq/pgval"
+	"github.com/Alisaien/pgq/ptr"
 	"github.com/jackc/pgtype"
 	jsoniter "github.com/json-iterator/go"
 	"time"
@@ -70,6 +71,24 @@ func (iter *Iterator) ReadInt16Ptr() *int16 {
 	return pgtyp.Int16Ptr.Read((*pgetc.Iterator)(iter))
 }
 
+func (iter *Iterator) ReadInt64() *int64 {
+	if iter.Iterator().ReadUint32() != pgtype.Int8OID {
+		iter.ReportError(pgetc.ErrUnexpectedType)
+		return nil
+	}
+
+	size := int32(iter.Iterator().ReadUint32())
+	if size == -1 {
+		return nil
+	}
+	if size != 8 {
+		iter.ReportError(pgetc.ErrInvalidSrcLength)
+		return nil
+	}
+
+	return ptr.Int64(int64(iter.Iterator().ReadUint64()))
+}
+
 func (iter *Iterator) ReadJSONB(v interface{}) {
 	oid := iter.Iterator().ReadUint32()
 	if oid != pgtype.JSONBOID {
@@ -78,7 +97,7 @@ func (iter *Iterator) ReadJSONB(v interface{}) {
 	size := int32(iter.Iterator().ReadUint32())
 
 	var (
-		err error
+		err  error
 		data []byte
 	)
 	if size == -1 {
@@ -90,7 +109,7 @@ func (iter *Iterator) ReadJSONB(v interface{}) {
 			iter.ReportError(pgetc.ErrUnknownVersion)
 		}
 
-		if err = iter.Iterator().Next(int(size)-1); err != nil { // 1 byte already read
+		if err = iter.Iterator().Next(int(size) - 1); err != nil { // 1 byte already read
 			return
 		}
 		data = iter.Iterator().Read()

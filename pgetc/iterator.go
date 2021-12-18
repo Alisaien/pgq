@@ -39,8 +39,17 @@ func (iter *Iterator) ReadByte() (byte, error) {
 }
 
 func (iter *Iterator) ReadUint32() uint32 {
-	_ = iter.Next4()
+	if iter.Next4() != nil {
+		return 0
+	}
 	return binary.BigEndian.Uint32(iter.Read())
+}
+
+func (iter *Iterator) ReadUint64() uint64 {
+	if iter.Next(8) != nil {
+		return 0
+	}
+	return binary.BigEndian.Uint64(iter.Read())
 }
 
 // Next prepares the next n bytes for reading
