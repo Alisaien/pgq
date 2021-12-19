@@ -6,6 +6,7 @@ import (
 	"github.com/Alisaien/pgq/pgtyp"
 	"github.com/Alisaien/pgq/pgval"
 	"github.com/Alisaien/pgq/ptr"
+	"github.com/gofrs/uuid"
 	"github.com/jackc/pgtype"
 	jsoniter "github.com/json-iterator/go"
 	"time"
@@ -132,10 +133,22 @@ func (iter *Iterator) ReadTime() time.Time {
 	return pgtyp.Timestamptz.Read((*pgetc.Iterator)(iter))
 }
 
-func (iter *Iterator) ReadUUID() pgetc.UUID {
-	return pgtyp.UUID.Read((*pgetc.Iterator)(iter))
-}
+func (iter *Iterator) ReadUUID() uuid.UUID {
+	if iter.Iterator().ReadUint32() != pgtype.UUIDOID {
+		iter.ReportError(pgetc.ErrUnexpectedType)
+		return uuid.UUID{}
+	}
 
-func (iter *Iterator) ReadUUIDPtr() *pgetc.UUID {
-	return pgtyp.UUIDPtr.Read((*pgetc.Iterator)(iter))
+	size := int32(iter.Iterator().ReadUint32())
+	if size != 16 {
+		iter.ReportError(pgetc.ErrInvalidSrcLength)
+		return uuid.UUID{}
+	}
+
+	if iter.Iterator().Next(16) != nil {
+		return uuid.UUID{}
+	}
+
+	id, _ := uuid.FromBytes(iter.Iterator().Read())
+	return id
 }

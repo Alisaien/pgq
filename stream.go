@@ -3,6 +3,7 @@ package pgq
 import (
 	"github.com/Alisaien/pgq/pgetc"
 	"github.com/Alisaien/pgq/pgtyp"
+	"github.com/gofrs/uuid"
 	"github.com/jackc/pgtype"
 	jsoniter "github.com/json-iterator/go"
 	"time"
@@ -99,6 +100,8 @@ func (stream *Stream) WriteTime(t time.Time) {
 	stream.Stream().WriteUint64(uint64(microsecSinceUnixEpoch - pgetc.MicroSecFromUnixEpochToY2K))
 }
 
-func (stream *Stream) WriteUUID(uuid pgetc.UUID) {
-	uuid.WriteType(stream.Stream())
+func (stream *Stream) WriteUUID(id uuid.UUID) {
+	stream.Stream().WriteUint32(pgtype.UUIDOID)
+	stream.Stream().WriteUint32(16)
+	stream.Stream().Write(id.Bytes())
 }
