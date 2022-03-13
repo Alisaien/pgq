@@ -43,7 +43,20 @@ func (iter *Iterator) ReadCompositeTypeHeader() uint32 {
 	return pgbin.Uint32.Read((*pgetc.Iterator)(iter))
 }
 
-func (iter *Iterator) ReadEnum(oid pgetc.OID) *string {
+func (iter *Iterator) ReadEnum(oid pgetc.OID) string {
+	v := iter.ReadEnumN(oid)
+	if v == nil {
+		if iter.Err() == nil {
+			iter.ReportError(pgetc.ErrNull)
+		} else {
+			return ""
+		}
+	}
+
+	return *v
+}
+
+func (iter *Iterator) ReadEnumN(oid pgetc.OID) *string {
 	id := iter.Iterator().ReadUint32()
 	if id == 0 {
 		return nil
@@ -65,7 +78,20 @@ func (iter *Iterator) ReadEnum(oid pgetc.OID) *string {
 	return &v
 }
 
-func (iter *Iterator) ReadInt() *int {
+func (iter *Iterator) ReadInt() int {
+	v := iter.ReadIntN()
+	if v == nil {
+		if iter.Err() == nil {
+			iter.ReportError(pgetc.ErrNull)
+		} else {
+			return 0
+		}
+	}
+
+	return *v
+}
+
+func (iter *Iterator) ReadIntN() *int {
 	if iter.Iterator().ReadUint32() != pgtype.Int4OID {
 		iter.ReportError(pgetc.ErrUnexpectedType)
 		return nil
@@ -83,7 +109,20 @@ func (iter *Iterator) ReadInt() *int {
 	return &v
 }
 
-func (iter *Iterator) ReadInt16() *int16 {
+func (iter *Iterator) ReadInt16() int16 {
+	v := iter.ReadInt16N()
+	if v == nil {
+		if iter.Err() == nil {
+			iter.ReportError(pgetc.ErrNull)
+		} else {
+			return 0
+		}
+	}
+
+	return *v
+}
+
+func (iter *Iterator) ReadInt16N() *int16 {
 	if iter.Iterator().ReadUint32() != pgtype.Int2OID {
 		iter.ReportError(pgetc.ErrUnexpectedType)
 		return nil
@@ -101,7 +140,20 @@ func (iter *Iterator) ReadInt16() *int16 {
 	return &v
 }
 
-func (iter *Iterator) ReadInt64() *int64 {
+func (iter *Iterator) ReadInt64() int64 {
+	v := iter.ReadInt64N()
+	if v == nil {
+		if iter.Err() == nil {
+			iter.ReportError(pgetc.ErrNull)
+		} else {
+			return 0
+		}
+	}
+
+	return *v
+}
+
+func (iter *Iterator) ReadInt64N() *int64 {
 	if iter.Iterator().ReadUint32() != pgtype.Int8OID {
 		iter.ReportError(pgetc.ErrUnexpectedType)
 		return nil
