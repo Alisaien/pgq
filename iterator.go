@@ -4,8 +4,6 @@ import (
 	"github.com/Alisaien/pgq/pgbin"
 	"github.com/Alisaien/pgq/pgetc"
 	"github.com/Alisaien/pgq/pgtyp"
-	"github.com/Alisaien/pgq/pgval"
-	"github.com/Alisaien/pgq/ptr"
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgtype"
 	jsoniter "github.com/json-iterator/go"
@@ -39,55 +37,89 @@ func (iter *Iterator) ReadBoolPtr() *bool {
 }
 
 func (iter *Iterator) ReadCompositeTypeHeader() uint32 {
-	if err := (*pgetc.Iterator)(iter).Next4(); err != nil {
+	if err := (*pgetc.Iterator)(iter).Next(4); err != nil {
 		return 0
 	}
 	return pgbin.Uint32.Read((*pgetc.Iterator)(iter))
 }
 
-func (iter *Iterator) ReadEnum(oid pgetc.OID) string {
+func (iter *Iterator) ReadEnum(oid pgetc.OID) *string {
 	id := iter.Iterator().ReadUint32()
 	if id == 0 {
-		return ""
+		return nil
 	} else if id != uint32(oid) {
 		iter.ReportError(pgetc.ErrUnexpectedType)
-	}
-
-	return pgval.String.Read(iter.Iterator())
-}
-
-func (iter *Iterator) ReadInt() int {
-	return pgtyp.Int.Read((*pgetc.Iterator)(iter))
-}
-
-func (iter *Iterator) ReadIntPtr() *int {
-	return pgtyp.IntPtr.Read((*pgetc.Iterator)(iter))
-}
-
-func (iter *Iterator) ReadInt16() int16 {
-	return pgtyp.Int16.Read((*pgetc.Iterator)(iter))
-}
-
-func (iter *Iterator) ReadInt16Ptr() *int16 {
-	return pgtyp.Int16Ptr.Read((*pgetc.Iterator)(iter))
-}
-
-func (iter *Iterator) ReadInt64() *int64 {
-	if iter.Iterator().ReadUint32() != pgtype.Int8OID {
-		iter.ReportError(pgetc.ErrUnexpectedType)
-		return nil
 	}
 
 	size := int32(iter.Iterator().ReadUint32())
 	if size == -1 {
 		return nil
 	}
-	if size != 8 {
+
+	if iter.Iterator().Next(int(size)) != nil {
 		iter.ReportError(pgetc.ErrInvalidSrcLength)
 		return nil
 	}
 
-	return ptr.Int64(int64(iter.Iterator().ReadUint64()))
+	s := string(iter.Iterator().Read())
+	return &s
+}
+
+func (iter *Iterator) ReadInt(v *int) bool {
+	if iter.Iterator().ReadUint32() != pgtype.Int4OID {
+		iter.ReportError(pgetc.ErrUnexpectedType)
+		return false
+	}
+
+	size := int32(iter.Iterator().ReadUint32())
+	if size == -1 {
+		return false
+	}
+	if size != 4 {
+		iter.ReportError(pgetc.ErrInvalidSrcLength)
+		return false
+	}
+
+	*v = int(iter.Iterator().ReadUint32())
+	return true
+}
+
+func (iter *Iterator) ReadInt16(v *int16) bool {
+	if iter.Iterator().ReadUint32() != pgtype.Int2OID {
+		iter.ReportError(pgetc.ErrUnexpectedType)
+		return false
+	}
+
+	size := int32(iter.Iterator().ReadUint32())
+	if size == -1 {
+		return false
+	}
+	if size != 2 {
+		iter.ReportError(pgetc.ErrInvalidSrcLength)
+		return false
+	}
+
+	*v = int16(iter.Iterator().ReadUint16())
+	return true
+}
+
+func (iter *Iterator) ReadInt64(v *int64) bool {
+	if iter.Iterator().ReadUint32() != pgtype.Int8OID {
+		iter.ReportError(pgetc.ErrUnexpectedType)
+		return false
+	}
+
+	size := int32(iter.Iterator().ReadUint32())
+	if size == -1 {
+		return false
+	}
+	if size != 8 {
+		iter.ReportError(pgetc.ErrInvalidSrcLength)
+		return false
+	}
+
+	*v = int64(iter.Iterator().ReadUint64())
+	return true
 }
 
 func (iter *Iterator) ReadJSONB(v interface{}) {

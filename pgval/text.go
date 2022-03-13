@@ -11,10 +11,10 @@ type _string struct{}
 type _stringPtr struct{}
 
 var String = _string{}
-var StringPtr =_stringPtr{}
+var StringPtr = _stringPtr{}
 
 func (_string) Read(iter *pgetc.Iterator) string {
-	if iter.Next4() != nil {
+	if iter.Next(4) != nil {
 		return ""
 	}
 
@@ -32,7 +32,7 @@ func (_string) Read(iter *pgetc.Iterator) string {
 }
 
 func (_stringPtr) Read(iter *pgetc.Iterator) *string {
-	if iter.Next4() != nil {
+	if iter.Next(4) != nil {
 		return nil
 	}
 

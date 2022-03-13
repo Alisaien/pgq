@@ -7,16 +7,16 @@ import (
 	"unsafe"
 )
 
-const Int2OID  = 21
+const Int2OID = 21
 
 type _int16 struct{}
 type _int16Ptr struct{}
 
 var Int16 = _int16{}
-var Int16Ptr =_int16Ptr{}
+var Int16Ptr = _int16Ptr{}
 
 func (_int16) Read(iter *pgetc.Iterator) int16 {
-	if iter.Next4() != nil {
+	if iter.Next(4) != nil {
 		return 0
 	}
 
@@ -29,7 +29,7 @@ func (_int16) Read(iter *pgetc.Iterator) int16 {
 }
 
 func (_int16Ptr) Read(iter *pgetc.Iterator) *int16 {
-	if iter.Next4() != nil {
+	if iter.Next(4) != nil {
 		return nil
 	}
 

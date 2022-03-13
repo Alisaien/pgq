@@ -10,10 +10,10 @@ type _bool struct{}
 type _boolPtr struct{}
 
 var Bool = _bool{}
-var BoolPtr =_boolPtr{}
+var BoolPtr = _boolPtr{}
 
 func (_bool) Read(iter *pgetc.Iterator) bool {
-	if iter.Next4() != nil {
+	if iter.Next(4) != nil {
 		return false
 	}
 
@@ -31,7 +31,7 @@ func (_bool) Read(iter *pgetc.Iterator) bool {
 }
 
 func (_boolPtr) Read(iter *pgetc.Iterator) *bool {
-	if iter.Next4() != nil {
+	if iter.Next(4) != nil {
 		return nil
 	}
 

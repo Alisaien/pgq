@@ -6,8 +6,6 @@ import (
 	"github.com/Alisaien/pgq/pgval"
 )
 
-
-
 type (
 	_oid struct{}
 )
@@ -17,7 +15,7 @@ var (
 )
 
 func (_oid) Read(iter *pgetc.Iterator) pgetc.OID {
-	if iter.Next4() != nil {
+	if iter.Next(4) != nil {
 		return 0
 	}
 

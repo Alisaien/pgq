@@ -12,7 +12,7 @@ type _timestamptz struct{}
 var Timestamptz _timestamptz
 
 func (_timestamptz) Read(iter *pgetc.Iterator) time.Time {
-	if iter.Next4() != nil {
+	if iter.Next(4) != nil {
 		return time.Time{}
 	}
 

@@ -22,7 +22,7 @@ var IntPtr = _intPtr{}
 var Int32Ptr = _int32Ptr{}
 
 func (_int) Read(iter *pgetc.Iterator) int {
-	if iter.Next4() != nil {
+	if iter.Next(4) != nil {
 		return 0
 	}
 
@@ -40,7 +40,7 @@ func (_int) Read(iter *pgetc.Iterator) int {
 }
 
 func (_intPtr) Read(iter *pgetc.Iterator) *int {
-	if iter.Next4() != nil {
+	if iter.Next(4) != nil {
 		return nil
 	}
 
@@ -58,7 +58,7 @@ func (_intPtr) Read(iter *pgetc.Iterator) *int {
 }
 
 func (_int32Ptr) Read(iter *pgetc.Iterator) *int32 {
-	if iter.Next4() != nil {
+	if iter.Next(4) != nil {
 		return nil
 	}
 
@@ -76,7 +76,7 @@ func (_int32Ptr) Read(iter *pgetc.Iterator) *int32 {
 }
 
 func (_uint32) Read(iter *pgetc.Iterator) uint32 {
-	if iter.Next4() != nil {
+	if iter.Next(4) != nil {
 		return 0
 	}
 
