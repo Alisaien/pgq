@@ -61,65 +61,62 @@ func (iter *Iterator) ReadEnum(oid pgetc.OID) *string {
 		return nil
 	}
 
-	s := string(iter.Iterator().Read())
-	return &s
+	v := string(iter.Iterator().Read())
+	return &v
 }
 
-func (iter *Iterator) ReadInt(v *int) bool {
+func (iter *Iterator) ReadInt() *int {
 	if iter.Iterator().ReadUint32() != pgtype.Int4OID {
 		iter.ReportError(pgetc.ErrUnexpectedType)
-		return false
+		return nil
 	}
 
 	size := int32(iter.Iterator().ReadUint32())
 	if size == -1 {
-		return false
-	}
-	if size != 4 {
+		return nil
+	} else if size != 4 {
 		iter.ReportError(pgetc.ErrInvalidSrcLength)
-		return false
+		return nil
 	}
 
-	*v = int(iter.Iterator().ReadUint32())
-	return true
+	v := int(iter.Iterator().ReadUint32())
+	return &v
 }
 
-func (iter *Iterator) ReadInt16(v *int16) bool {
+func (iter *Iterator) ReadInt16() *int16 {
 	if iter.Iterator().ReadUint32() != pgtype.Int2OID {
 		iter.ReportError(pgetc.ErrUnexpectedType)
-		return false
+		return nil
 	}
 
 	size := int32(iter.Iterator().ReadUint32())
 	if size == -1 {
-		return false
-	}
-	if size != 2 {
+		return nil
+	} else if size != 2 {
 		iter.ReportError(pgetc.ErrInvalidSrcLength)
-		return false
+		return nil
 	}
 
-	*v = int16(iter.Iterator().ReadUint16())
-	return true
+	v := int16(iter.Iterator().ReadUint16())
+	return &v
 }
 
-func (iter *Iterator) ReadInt64(v *int64) bool {
+func (iter *Iterator) ReadInt64() *int64 {
 	if iter.Iterator().ReadUint32() != pgtype.Int8OID {
 		iter.ReportError(pgetc.ErrUnexpectedType)
-		return false
+		return nil
 	}
 
 	size := int32(iter.Iterator().ReadUint32())
 	if size == -1 {
-		return false
-	}
-	if size != 8 {
+		return nil
+	} else if size != 8 {
 		iter.ReportError(pgetc.ErrInvalidSrcLength)
-		return false
+		return nil
 	}
 
-	*v = int64(iter.Iterator().ReadUint64())
-	return true
+	v := int64(iter.Iterator().ReadUint64())
+	return &v
 }
 
 func (iter *Iterator) ReadJSONB(v interface{}) {
