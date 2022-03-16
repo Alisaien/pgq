@@ -218,7 +218,7 @@ func (iter *Iterator) ReadStringPtr() *string {
 }
 
 func (iter *Iterator) ReadTime() time.Time {
-	if iter.Iterator().ReadUint32() != pgtype.TimestampOID {
+	if iter.Iterator().ReadUint32() != pgtype.TimestamptzOID {
 		iter.ReportError(pgetc.ErrUnexpectedType)
 		return time.Time{}
 	}
