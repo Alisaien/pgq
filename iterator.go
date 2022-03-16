@@ -1,6 +1,7 @@
 package pgq
 
 import (
+	"encoding/binary"
 	"github.com/Alisaien/pgq/pgbin"
 	"github.com/Alisaien/pgq/pgetc"
 	"github.com/Alisaien/pgq/pgtyp"
@@ -8,6 +9,12 @@ import (
 	"github.com/jackc/pgtype"
 	jsoniter "github.com/json-iterator/go"
 	"time"
+)
+
+const (
+	microSecFromUnixEpochToY2K = 946684800 * 1000000
+	inftyMicroSecOffset        = 9223372036854775807
+	negInftyMicroSecOffset     = -9223372036854775808
 )
 
 type Iterator pgetc.Iterator
@@ -211,7 +218,32 @@ func (iter *Iterator) ReadStringPtr() *string {
 }
 
 func (iter *Iterator) ReadTime() time.Time {
-	return pgtyp.Timestamptz.Read((*pgetc.Iterator)(iter))
+	if iter.Iterator().ReadUint32() != pgtype.TimestampOID {
+		iter.ReportError(pgetc.ErrUnexpectedType)
+		return time.Time{}
+	}
+
+	size := int32(iter.Iterator().ReadUint32())
+	if size == -1 {
+		return time.Time{}
+	} else if size != 8 {
+		iter.ReportError(pgetc.ErrInvalidSrcLength)
+		return time.Time{}
+	}
+
+	if iter.Iterator().Next(int(size)) != nil {
+		return time.Time{}
+	}
+
+	microsecSinceY2K := int64(binary.BigEndian.Uint64(iter.Iterator().Read()))
+	switch microsecSinceY2K {
+	case inftyMicroSecOffset, negInftyMicroSecOffset:
+		iter.ReportError(pgetc.ErrInfinity)
+		return time.Time{}
+	default:
+		microSecSinceUnixEpoch := microSecFromUnixEpochToY2K + microsecSinceY2K
+		return time.Unix(microSecSinceUnixEpoch/1000000, (microSecSinceUnixEpoch%1000000)*1000)
+	}
 }
 
 func (iter *Iterator) ReadUUID() uuid.UUID {
